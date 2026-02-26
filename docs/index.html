@@ -1,0 +1,2556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Health Diagnostics</title>
+    <style>
+/*
+ * style.css — Device Health Diagnostics
+ * Uses Zenith design token conventions for colors, spacing, typography.
+ */
+
+/* ── Design Tokens ──────────────────────────────────────────────── */
+
+:root {
+    --dhd-color-primary: #1976d2;
+    --dhd-color-primary-light: #e3f2fd;
+    --dhd-color-success: #2e7d32;
+    --dhd-color-success-light: #e8f5e9;
+    --dhd-color-warning: #ed6c02;
+    --dhd-color-warning-light: #fff3e0;
+    --dhd-color-error: #d32f2f;
+    --dhd-color-error-light: #ffebee;
+    --dhd-color-info: #0288d1;
+    --dhd-color-info-light: #e1f5fe;
+    --dhd-color-text: #212121;
+    --dhd-color-text-secondary: #616161;
+    --dhd-color-text-hint: #9e9e9e;
+    --dhd-color-border: #e0e0e0;
+    --dhd-color-bg: #f5f5f5;
+    --dhd-color-surface: #ffffff;
+    --dhd-radius: 6px;
+    --dhd-radius-sm: 4px;
+    --dhd-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+    --dhd-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --dhd-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --dhd-space-xs: 4px;
+    --dhd-space-sm: 8px;
+    --dhd-space-md: 16px;
+    --dhd-space-lg: 24px;
+    --dhd-space-xl: 32px;
+}
+
+/* ── Reset & Base ───────────────────────────────────────────────── */
+
+.dhd-container {
+    font-family: var(--dhd-font);
+    color: var(--dhd-color-text);
+    background: var(--dhd-color-bg);
+    padding: var(--dhd-space-lg);
+    min-height: 100%;
+    position: relative;
+}
+
+.dhd-container *, .dhd-container *::before, .dhd-container *::after {
+    box-sizing: border-box;
+}
+
+/* ── Views ──────────────────────────────────────────────────────── */
+
+.dhd-view {
+    display: none;
+}
+
+.dhd-view--active {
+    display: block;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+
+.dhd-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--dhd-space-lg);
+}
+
+.dhd-header__title {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--dhd-color-text);
+}
+
+/* ── Buttons ────────────────────────────────────────────────────── */
+
+.dhd-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--dhd-space-xs);
+    padding: var(--dhd-space-sm) var(--dhd-space-md);
+    font-family: var(--dhd-font);
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--dhd-color-border);
+    border-radius: var(--dhd-radius-sm);
+    background: var(--dhd-color-surface);
+    color: var(--dhd-color-text);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.dhd-btn:hover {
+    background: var(--dhd-color-bg);
+    border-color: var(--dhd-color-text-hint);
+}
+
+.dhd-btn--refresh {
+    font-size: 14px;
+}
+
+.dhd-btn--back {
+    font-size: 14px;
+    color: var(--dhd-color-primary);
+    border-color: var(--dhd-color-primary);
+}
+
+.dhd-btn--back:hover {
+    background: var(--dhd-color-primary-light);
+}
+
+.dhd-btn--small {
+    padding: var(--dhd-space-xs) var(--dhd-space-sm);
+    font-size: 12px;
+}
+
+.dhd-btn--diagnose {
+    color: var(--dhd-color-primary);
+    border-color: var(--dhd-color-primary);
+}
+
+.dhd-btn--diagnose:hover {
+    background: var(--dhd-color-primary-light);
+}
+
+/* ── Loading ────────────────────────────────────────────────────── */
+
+.dhd-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--dhd-space-sm);
+    padding: var(--dhd-space-xl) 0;
+    color: var(--dhd-color-text-secondary);
+    font-size: 14px;
+}
+
+.dhd-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--dhd-color-border);
+    border-top-color: var(--dhd-color-primary);
+    border-radius: 50%;
+    animation: dhd-spin 0.7s linear infinite;
+}
+
+@keyframes dhd-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Error ──────────────────────────────────────────────────────── */
+
+.dhd-error {
+    background: var(--dhd-color-error-light);
+    color: var(--dhd-color-error);
+    padding: var(--dhd-space-md);
+    border-radius: var(--dhd-radius);
+    border: 1px solid var(--dhd-color-error);
+    font-size: 13px;
+    margin-bottom: var(--dhd-space-md);
+}
+
+/* ── Summary Tiles ──────────────────────────────────────────────── */
+
+.dhd-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: var(--dhd-space-md);
+    margin-bottom: var(--dhd-space-lg);
+}
+
+.dhd-tile {
+    background: var(--dhd-color-surface);
+    border: 1px solid var(--dhd-color-border);
+    border-radius: var(--dhd-radius);
+    padding: var(--dhd-space-md);
+    text-align: center;
+    cursor: pointer;
+    transition: box-shadow 0.15s, border-color 0.15s, transform 0.1s;
+    user-select: none;
+}
+
+.dhd-tile:hover {
+    box-shadow: var(--dhd-shadow);
+    transform: translateY(-1px);
+}
+
+.dhd-tile--active {
+    border-color: var(--dhd-color-primary);
+    box-shadow: 0 0 0 2px var(--dhd-color-primary-light);
+}
+
+.dhd-tile--total {
+    border-left: 3px solid var(--dhd-color-primary);
+}
+
+.dhd-tile--healthy {
+    border-left: 3px solid var(--dhd-color-success);
+}
+
+.dhd-tile--issue {
+    border-left: 3px solid var(--dhd-color-error);
+}
+
+.dhd-tile__count {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--dhd-color-text);
+}
+
+.dhd-tile__label {
+    font-size: 12px;
+    color: var(--dhd-color-text-secondary);
+    margin-top: var(--dhd-space-xs);
+}
+
+/* ── Filter Bar ─────────────────────────────────────────────────── */
+
+.dhd-filter-bar {
+    margin-bottom: var(--dhd-space-md);
+}
+
+.dhd-search {
+    width: 100%;
+    max-width: 400px;
+    padding: var(--dhd-space-sm) var(--dhd-space-md);
+    font-family: var(--dhd-font);
+    font-size: 13px;
+    border: 1px solid var(--dhd-color-border);
+    border-radius: var(--dhd-radius-sm);
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.dhd-search:focus {
+    border-color: var(--dhd-color-primary);
+}
+
+/* ── Table ──────────────────────────────────────────────────────── */
+
+.dhd-table-wrap {
+    overflow-x: auto;
+}
+
+.dhd-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--dhd-color-surface);
+    border-radius: var(--dhd-radius);
+    overflow: hidden;
+    box-shadow: var(--dhd-shadow);
+}
+
+.dhd-table__th {
+    text-align: left;
+    padding: var(--dhd-space-sm) var(--dhd-space-md);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--dhd-color-text-secondary);
+    background: var(--dhd-color-bg);
+    border-bottom: 2px solid var(--dhd-color-border);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.dhd-table__th:hover {
+    color: var(--dhd-color-text);
+}
+
+.dhd-sort-icon::after {
+    content: "\2195";
+    margin-left: 4px;
+    font-size: 10px;
+    opacity: 0.4;
+}
+
+.dhd-sort--asc .dhd-sort-icon::after {
+    content: "\2191";
+    opacity: 1;
+}
+
+.dhd-sort--desc .dhd-sort-icon::after {
+    content: "\2193";
+    opacity: 1;
+}
+
+.dhd-table__row {
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.dhd-table__row:hover {
+    background: var(--dhd-color-primary-light);
+}
+
+.dhd-table__cell {
+    padding: var(--dhd-space-sm) var(--dhd-space-md);
+    font-size: 13px;
+    border-bottom: 1px solid var(--dhd-color-border);
+    white-space: nowrap;
+}
+
+.dhd-empty {
+    text-align: center;
+    padding: var(--dhd-space-xl);
+    color: var(--dhd-color-text-hint);
+    font-style: italic;
+}
+
+/* ── Badges / Severity ──────────────────────────────────────────── */
+
+.dhd-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.dhd-severity--critical {
+    background: var(--dhd-color-error-light);
+    color: var(--dhd-color-error);
+}
+
+.dhd-severity--warning {
+    background: var(--dhd-color-warning-light);
+    color: var(--dhd-color-warning);
+}
+
+.dhd-severity--info {
+    background: var(--dhd-color-info-light);
+    color: var(--dhd-color-info);
+}
+
+.dhd-severity--healthy {
+    background: var(--dhd-color-success-light);
+    color: var(--dhd-color-success);
+}
+
+/* ── Health Score Bar (table) ───────────────────────────────────── */
+
+.dhd-health-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--dhd-space-sm);
+    width: 100%;
+    max-width: 120px;
+}
+
+.dhd-health-bar__fill {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--dhd-color-success);
+    transition: width 0.3s;
+    flex-shrink: 0;
+}
+
+.dhd-health-bar__fill--warning {
+    background: var(--dhd-color-warning);
+}
+
+.dhd-health-bar__fill--critical {
+    background: var(--dhd-color-error);
+}
+
+.dhd-health-bar__text {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--dhd-color-text-secondary);
+    min-width: 24px;
+}
+
+/* ── Drill-Down Header ──────────────────────────────────────────── */
+
+.dhd-drill-header {
+    display: flex;
+    align-items: center;
+    gap: var(--dhd-space-md);
+    margin-bottom: var(--dhd-space-lg);
+}
+
+.dhd-drill-title h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.dhd-drill-serial {
+    font-size: 13px;
+    color: var(--dhd-color-text-secondary);
+}
+
+/* ── Cards ──────────────────────────────────────────────────────── */
+
+.dhd-card {
+    background: var(--dhd-color-surface);
+    border: 1px solid var(--dhd-color-border);
+    border-radius: var(--dhd-radius);
+    padding: var(--dhd-space-lg);
+    margin-bottom: var(--dhd-space-md);
+    box-shadow: var(--dhd-shadow);
+}
+
+.dhd-card__title {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 var(--dhd-space-md) 0;
+    color: var(--dhd-color-text);
+}
+
+/* ── Drill-Down Grid (score + issues side by side) ──────────────── */
+
+.dhd-drill-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--dhd-space-md);
+}
+
+/* ── Health Score (drill-down) ──────────────────────────────────── */
+
+.dhd-score {
+    text-align: center;
+    padding: var(--dhd-space-md);
+}
+
+.dhd-score__value {
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.dhd-score__label {
+    font-size: 13px;
+    color: var(--dhd-color-text-secondary);
+    margin-top: var(--dhd-space-xs);
+}
+
+.dhd-score--healthy .dhd-score__value { color: var(--dhd-color-success); }
+.dhd-score--warning .dhd-score__value { color: var(--dhd-color-warning); }
+.dhd-score--critical .dhd-score__value { color: var(--dhd-color-error); }
+
+/* ── Root Cause Cards ───────────────────────────────────────────── */
+
+.dhd-root-cause {
+    border: 1px solid var(--dhd-color-border);
+    border-radius: var(--dhd-radius);
+    padding: var(--dhd-space-md);
+    margin-bottom: var(--dhd-space-sm);
+    border-left: 4px solid var(--dhd-color-border);
+}
+
+.dhd-root-cause--critical { border-left-color: var(--dhd-color-error); }
+.dhd-root-cause--warning  { border-left-color: var(--dhd-color-warning); }
+.dhd-root-cause--info     { border-left-color: var(--dhd-color-info); }
+
+.dhd-root-cause__header {
+    display: flex;
+    align-items: center;
+    gap: var(--dhd-space-sm);
+    flex-wrap: wrap;
+    margin-bottom: var(--dhd-space-sm);
+}
+
+.dhd-root-cause__rank {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--dhd-color-text);
+}
+
+.dhd-root-cause__category {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--dhd-color-text);
+}
+
+.dhd-root-cause__confidence {
+    font-size: 12px;
+    color: var(--dhd-color-text-secondary);
+    margin-left: auto;
+}
+
+.dhd-root-cause__explanation {
+    font-size: 13px;
+    color: var(--dhd-color-text-secondary);
+    line-height: 1.5;
+    margin-bottom: var(--dhd-space-sm);
+}
+
+.dhd-root-cause__actions {
+    font-size: 13px;
+}
+
+.dhd-root-cause__actions strong {
+    display: block;
+    margin-bottom: var(--dhd-space-xs);
+}
+
+.dhd-root-cause__actions ul {
+    margin: 0;
+    padding-left: var(--dhd-space-lg);
+}
+
+.dhd-root-cause__actions li {
+    margin-bottom: var(--dhd-space-xs);
+    line-height: 1.4;
+}
+
+/* ── Charts ─────────────────────────────────────────────────────── */
+
+.dhd-charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--dhd-space-lg);
+}
+
+.dhd-chart-container {
+    min-height: 200px;
+}
+
+.dhd-chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dhd-color-text-secondary);
+    margin: 0 0 var(--dhd-space-sm) 0;
+}
+
+.dhd-chart-container canvas {
+    width: 100%;
+    display: block;
+}
+
+/* ── Fault History Table ────────────────────────────────────────── */
+
+.dhd-table--faults {
+    font-size: 12px;
+}
+
+.dhd-table--faults th {
+    padding: var(--dhd-space-sm);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--dhd-color-text-secondary);
+    background: var(--dhd-color-bg);
+    border-bottom: 1px solid var(--dhd-color-border);
+    text-align: left;
+}
+
+.dhd-table--faults td {
+    padding: var(--dhd-space-sm);
+    border-bottom: 1px solid var(--dhd-color-border);
+}
+
+/* ── Device Info Grid ───────────────────────────────────────────── */
+
+.dhd-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--dhd-space-sm) var(--dhd-space-lg);
+}
+
+.dhd-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dhd-info-item__label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--dhd-color-text-hint);
+}
+
+.dhd-info-item__value {
+    font-size: 14px;
+    color: var(--dhd-color-text);
+}
+
+/* ── Empty State ────────────────────────────────────────────────── */
+
+.dhd-empty-state {
+    text-align: center;
+    padding: var(--dhd-space-lg);
+    color: var(--dhd-color-text-hint);
+    font-size: 13px;
+    font-style: italic;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+    .dhd-drill-grid {
+        grid-template-columns: 1fr;
+    }
+    .dhd-charts-grid {
+        grid-template-columns: 1fr;
+    }
+    .dhd-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .dhd-container {
+        padding: var(--dhd-space-md);
+    }
+    .dhd-tiles {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+    .dhd-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--dhd-space-sm);
+    }
+}
+
+</style>
+</head>
+<body>
+    <div id="dhdContainer" class="dhd-container">
+
+        <!-- Loading overlay -->
+        <div id="dhdLoading" class="dhd-loading" style="display:none;">
+            <div class="dhd-spinner"></div>
+            <span>Loading…</span>
+        </div>
+
+        <!-- Error banner -->
+        <div id="dhdError" class="dhd-error" style="display:none;"></div>
+
+        <!-- Header bar -->
+        <div class="dhd-header">
+            <h1 class="dhd-header__title">Device Health Diagnostics</h1>
+            <button id="dhdRefreshBtn" class="dhd-btn dhd-btn--refresh" title="Refresh">&#x21bb; Refresh</button>
+        </div>
+
+        <!-- ═══ Fleet Dashboard View ═══ -->
+        <div id="dhdFleetView" class="dhd-view dhd-view--active">
+
+            <!-- Summary tiles -->
+            <div id="dhdTiles" class="dhd-tiles"></div>
+
+            <!-- Search / filter bar -->
+            <div class="dhd-filter-bar">
+                <input type="text" id="dhdSearch" class="dhd-search" placeholder="Search by name or serial number…">
+            </div>
+
+            <!-- Device table -->
+            <div class="dhd-table-wrap">
+                <table class="dhd-table">
+                    <thead>
+                        <tr>
+                            <th class="dhd-table__th" data-sort="name">Name <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="serial">Serial # <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="severity">Severity <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="category">Issue <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="health">Health <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="lastComm">Last Comm <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dhdTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ═══ Device Drill-Down View ═══ -->
+        <div id="dhdDrillView" class="dhd-view">
+
+            <!-- Drill-down header (back btn + device name) -->
+            <div id="dhdDrillHeader" class="dhd-drill-header"></div>
+
+            <div class="dhd-drill-grid">
+
+                <!-- Health Score -->
+                <section class="dhd-card">
+                    <h3 class="dhd-card__title">Health Score</h3>
+                    <div id="dhdHealthScore"></div>
+                </section>
+
+                <!-- Active Issues -->
+                <section class="dhd-card">
+                    <h3 class="dhd-card__title">Active Issues</h3>
+                    <div id="dhdActiveIssues"></div>
+                </section>
+            </div>
+
+            <!-- Root Cause Analysis -->
+            <section class="dhd-card">
+                <h3 class="dhd-card__title">Root Cause Analysis</h3>
+                <div id="dhdRootCauses"></div>
+            </section>
+
+            <!-- Diagnostic Timeline Charts -->
+            <section class="dhd-card">
+                <h3 class="dhd-card__title">Diagnostic Timeline</h3>
+                <div class="dhd-charts-grid">
+                    <div class="dhd-chart-container">
+                        <h4 class="dhd-chart-title">Battery Voltage (30 days)</h4>
+                        <canvas id="dhdVoltageChart"></canvas>
+                    </div>
+                    <div class="dhd-chart-container">
+                        <h4 class="dhd-chart-title">Cellular RSSI (30 days)</h4>
+                        <canvas id="dhdRSSIChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Fault History -->
+            <section class="dhd-card">
+                <h3 class="dhd-card__title">Fault History (Last 30 Days)</h3>
+                <div id="dhdFaultHistory"></div>
+            </section>
+
+            <!-- Device Info -->
+            <section class="dhd-card">
+                <h3 class="dhd-card__title">Device Information</h3>
+                <div id="dhdDeviceInfo"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Scripts (order matters — constants first, main last) -->
+    <script>
+/**
+ * constants.js — Single source of truth for Geotab diagnostic KnownIds,
+ * fault code mappings, and classification thresholds.
+ */
+var DHD = DHD || {};
+
+DHD.Constants = (function () {
+    "use strict";
+
+    // ── StatusData diagnostic KnownIds (16 total) ──────────────────────
+
+    var Diagnostics = {
+        // Power
+        VOLTAGE: "DiagnosticGoDeviceVoltageId",
+        CRANKING_VOLTAGE: "DiagnosticCrankingVoltageId",
+
+        // GPS
+        GPS_NOT_RESPONDING: "DiagnosticGpsNotRespondingId",
+        GPS_ANTENNA_UNPLUGGED: "DiagnosticGpsAntennaUnpluggedId",
+        GPS_ANTENNA_SHORT: "DiagnosticGpsAntennaShortCircuitId",
+
+        // Cellular
+        CELLULAR_RSSI: "DiagnosticCellularRssiId",
+        INTERMITTENT_CONNECTION: "DiagnosticIntermittentConnectionCommunicationsId",
+
+        // Harness
+        HARNESS_STANDARD: "DiagnosticStandardHarnessDetectedId",
+        HARNESS_6PIN: "DiagnosticHarnessDetected6PinId",
+        HARNESS_9PIN: "DiagnosticHarnessDetected9PinId",
+
+        // CAN bus
+        CAN_INIT_FAIL: "DiagnosticCanBusFailedToInitializeId",
+        CAN_SHORT: "DiagnosticCanBusShortId",
+        CAN_DISABLED: "DiagnosticCanBusDisabledId",
+
+        // Device
+        UNPLUGGED: "DiagnosticDeviceHasBeenUnpluggedId",
+        FLASH_ERROR: "DiagnosticFlashErrorCountId",
+        BOOTLOADER_FAIL: "DiagnosticBootloaderUpdateHasFailedId"
+    };
+
+    // Ordered list for multiCall StatusData requests
+    var ALL_DIAGNOSTIC_IDS = [
+        Diagnostics.VOLTAGE,
+        Diagnostics.CRANKING_VOLTAGE,
+        Diagnostics.GPS_NOT_RESPONDING,
+        Diagnostics.GPS_ANTENNA_UNPLUGGED,
+        Diagnostics.GPS_ANTENNA_SHORT,
+        Diagnostics.CELLULAR_RSSI,
+        Diagnostics.INTERMITTENT_CONNECTION,
+        Diagnostics.HARNESS_STANDARD,
+        Diagnostics.HARNESS_6PIN,
+        Diagnostics.HARNESS_9PIN,
+        Diagnostics.CAN_INIT_FAIL,
+        Diagnostics.CAN_SHORT,
+        Diagnostics.CAN_DISABLED,
+        Diagnostics.UNPLUGGED,
+        Diagnostics.FLASH_ERROR,
+        Diagnostics.BOOTLOADER_FAIL
+    ];
+
+    // ── Fault code → category mapping ──────────────────────────────────
+
+    var FaultCategories = {
+        128: "hardware",   // Flash Fail
+        135: "power",      // Low Voltage
+        287: "installation", // Bad Install
+        297: "hardware",   // RAM failure
+        450: "hardware",   // RMA required
+        467: "hardware",   // Water damage
+        468: "hardware",   // Water damage
+        488: "oem",        // SWC issue
+        491: "oem"         // SWC issue
+    };
+
+    var HARDWARE_FAULT_CODES = [128, 297, 450, 467, 468];
+    var OEM_FAULT_CODES = [488, 491];
+
+    // ── Thresholds ─────────────────────────────────────────────────────
+
+    var Voltage = {
+        DEAD: 7,
+        LOW: 9,
+        WARNING: 11
+    };
+
+    var RSSI = {
+        NO_SIGNAL: -113,
+        POOR: -95,
+        FAIR: -85
+    };
+
+    var OfflineHours = {
+        NORMAL_SLEEP: 24,
+        EXTENDED: 72
+    };
+
+    // ── Severity levels ────────────────────────────────────────────────
+
+    var Severity = {
+        CRITICAL: "critical",
+        WARNING: "warning",
+        INFO: "info",
+        HEALTHY: "healthy"
+    };
+
+    // ── Issue categories ───────────────────────────────────────────────
+
+    var Category = {
+        UNPLUGGED: "unplugged",
+        HARDWARE: "hardware",
+        POWER: "power",
+        INSTALLATION: "installation",
+        GPS: "gps",
+        CELLULAR: "cellular",
+        FIRMWARE: "firmware",
+        OEM: "oem",
+        OFFLINE: "offline",
+        HEALTHY: "healthy"
+    };
+
+    // ── Health score deductions ─────────────────────────────────────────
+
+    var ScoreDeductions = {
+        critical: 40,
+        warning: 20,
+        info: 5
+    };
+
+    return {
+        Diagnostics: Diagnostics,
+        ALL_DIAGNOSTIC_IDS: ALL_DIAGNOSTIC_IDS,
+        FaultCategories: FaultCategories,
+        HARDWARE_FAULT_CODES: HARDWARE_FAULT_CODES,
+        OEM_FAULT_CODES: OEM_FAULT_CODES,
+        Voltage: Voltage,
+        RSSI: RSSI,
+        OfflineHours: OfflineHours,
+        Severity: Severity,
+        Category: Category,
+        ScoreDeductions: ScoreDeductions
+    };
+})();
+
+</script>
+    <script>
+/**
+ * deviceCache.js — Caches Device + Group data via multiCall at startup.
+ * Provides O(1) lookups by device ID.
+ */
+var DHD = DHD || {};
+
+DHD.DeviceCache = (function () {
+    "use strict";
+
+    var _devices = {};   // id → device object
+    var _groups = {};    // id → group object
+    var _loaded = false;
+
+    /**
+     * Load all devices and groups in a single multiCall.
+     * @param {Object} api - Geotab API object
+     * @returns {Promise}
+     */
+    function load(api) {
+        return new Promise(function (resolve, reject) {
+            api.multiCall([
+                ["Get", { typeName: "Device", resultsLimit: 50000 }],
+                ["Get", { typeName: "Group", resultsLimit: 10000 }]
+            ], function (results) {
+                var deviceList = results[0];
+                var groupList = results[1];
+
+                _devices = {};
+                deviceList.forEach(function (d) {
+                    _devices[d.id] = d;
+                });
+
+                _groups = {};
+                groupList.forEach(function (g) {
+                    _groups[g.id] = g;
+                });
+
+                _loaded = true;
+                resolve();
+            }, function (err) {
+                reject(err);
+            });
+        });
+    }
+
+    /**
+     * Get device by ID.
+     * @param {string} id
+     * @returns {Object|null}
+     */
+    function getDevice(id) {
+        return _devices[id] || null;
+    }
+
+    /**
+     * Get all devices as an array.
+     * @returns {Object[]}
+     */
+    function getAllDevices() {
+        return Object.keys(_devices).map(function (id) {
+            return _devices[id];
+        });
+    }
+
+    /**
+     * Get group name by ID.
+     * @param {string} id
+     * @returns {string}
+     */
+    function getGroupName(id) {
+        var g = _groups[id];
+        return g ? (g.name || id) : id;
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    function isLoaded() {
+        return _loaded;
+    }
+
+    return {
+        load: load,
+        getDevice: getDevice,
+        getAllDevices: getAllDevices,
+        getGroupName: getGroupName,
+        isLoaded: isLoaded
+    };
+})();
+
+</script>
+    <script>
+/**
+ * healthService.js — API fetch layer for fleet-level and device drill-down data.
+ */
+var DHD = DHD || {};
+
+DHD.HealthService = (function () {
+    "use strict";
+
+    var C = DHD.Constants;
+
+    /**
+     * Fetch fleet-level health data (2 API calls via multiCall):
+     *  1. DeviceStatusInfo for every device
+     *  2. FaultData (GoFault source, last 30 days)
+     *
+     * @param {Object} api
+     * @returns {Promise<{statusInfos: Object[], faultsByDevice: Object}>}
+     */
+    function fetchFleetHealth(api) {
+        var now = new Date();
+        var thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        return new Promise(function (resolve, reject) {
+            api.multiCall([
+                ["Get", {
+                    typeName: "DeviceStatusInfo",
+                    resultsLimit: 50000
+                }],
+                ["Get", {
+                    typeName: "FaultData",
+                    search: {
+                        fromDate: thirtyDaysAgo.toISOString(),
+                        toDate: now.toISOString(),
+                        diagnosticSearch: {
+                            source: { id: "SourceGeotabGoId" }
+                        }
+                    },
+                    resultsLimit: 100000
+                }]
+            ], function (results) {
+                var statusInfos = results[0];
+                var faults = results[1];
+
+                // Index faults by device ID for O(1) lookup
+                var faultsByDevice = {};
+                faults.forEach(function (f) {
+                    var devId = f.device ? f.device.id : null;
+                    if (devId) {
+                        if (!faultsByDevice[devId]) {
+                            faultsByDevice[devId] = [];
+                        }
+                        faultsByDevice[devId].push(f);
+                    }
+                });
+
+                resolve({
+                    statusInfos: statusInfos,
+                    faultsByDevice: faultsByDevice
+                });
+            }, function (err) {
+                reject(err);
+            });
+        });
+    }
+
+    /**
+     * Fetch device drill-down data (18 API calls via multiCall):
+     *  - 16x StatusData (one per diagnostic KnownId, 30-day range)
+     *  - 1x LogRecord (last 500 for GPS staleness)
+     *  - 1x FaultData (all faults for device)
+     *
+     * @param {Object} api
+     * @param {string} deviceId
+     * @returns {Promise<{statusData: Object, logRecords: Object[], faults: Object[]}>}
+     */
+    function fetchDeviceDrillDown(api, deviceId) {
+        var now = new Date();
+        var thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        var deviceSearch = { id: deviceId };
+        var dateSearch = {
+            fromDate: thirtyDaysAgo.toISOString(),
+            toDate: now.toISOString()
+        };
+
+        var calls = [];
+
+        // 16 StatusData calls — one per diagnostic
+        C.ALL_DIAGNOSTIC_IDS.forEach(function (diagId) {
+            calls.push(["Get", {
+                typeName: "StatusData",
+                search: {
+                    deviceSearch: deviceSearch,
+                    diagnosticSearch: { id: diagId },
+                    fromDate: dateSearch.fromDate,
+                    toDate: dateSearch.toDate
+                },
+                resultsLimit: 5000
+            }]);
+        });
+
+        // LogRecord — last 500
+        calls.push(["Get", {
+            typeName: "LogRecord",
+            search: {
+                deviceSearch: deviceSearch,
+                fromDate: dateSearch.fromDate,
+                toDate: dateSearch.toDate
+            },
+            resultsLimit: 500
+        }]);
+
+        // FaultData — all for this device
+        calls.push(["Get", {
+            typeName: "FaultData",
+            search: {
+                deviceSearch: deviceSearch,
+                fromDate: dateSearch.fromDate,
+                toDate: dateSearch.toDate
+            },
+            resultsLimit: 5000
+        }]);
+
+        return new Promise(function (resolve, reject) {
+            api.multiCall(calls, function (results) {
+                // Map diagnostic results by KnownId
+                var statusData = {};
+                C.ALL_DIAGNOSTIC_IDS.forEach(function (diagId, i) {
+                    statusData[diagId] = results[i];
+                });
+
+                var logRecords = results[16]; // index 16
+                var faults = results[17];     // index 17
+
+                resolve({
+                    statusData: statusData,
+                    logRecords: logRecords,
+                    faults: faults
+                });
+            }, function (err) {
+                reject(err);
+            });
+        });
+    }
+
+    return {
+        fetchFleetHealth: fetchFleetHealth,
+        fetchDeviceDrillDown: fetchDeviceDrillDown
+    };
+})();
+
+</script>
+    <script>
+/**
+ * rootCauseEngine.js — Decision tree and health scoring engine.
+ *
+ * Two entry points:
+ *  - classifyDevice()  : lightweight fleet-level classification
+ *  - analyzeDevice()   : full drill-down root cause analysis
+ */
+var DHD = DHD || {};
+
+DHD.RootCauseEngine = (function () {
+    "use strict";
+
+    var C = DHD.Constants;
+
+    // ── Helpers ────────────────────────────────────────────────────────
+
+    function hoursAgo(dateStr) {
+        if (!dateStr) { return Infinity; }
+        var dt = new Date(dateStr);
+        return (Date.now() - dt.getTime()) / (1000 * 60 * 60);
+    }
+
+    function hasFaultCode(faults, code) {
+        return faults.some(function (f) {
+            return f.diagnostic && String(f.diagnostic.id) === String(code);
+        });
+    }
+
+    function hasFaultCodes(faults, codes) {
+        return codes.some(function (code) {
+            return hasFaultCode(faults, code);
+        });
+    }
+
+    function latestValue(statusRecords) {
+        if (!statusRecords || statusRecords.length === 0) { return null; }
+        var sorted = statusRecords.slice().sort(function (a, b) {
+            return new Date(b.dateTime) - new Date(a.dateTime);
+        });
+        return sorted[0].data;
+    }
+
+    function faultCodesForDevice(faults) {
+        var codes = [];
+        faults.forEach(function (f) {
+            if (f.diagnostic && f.diagnostic.id) {
+                var num = parseInt(f.diagnostic.id, 10);
+                if (!isNaN(num)) {
+                    codes.push(num);
+                }
+            }
+            if (f.failureMode && f.failureMode.id) {
+                var fmId = parseInt(f.failureMode.id, 10);
+                if (!isNaN(fmId)) {
+                    codes.push(fmId);
+                }
+            }
+        });
+        return codes;
+    }
+
+    // ── Fleet-level classification ─────────────────────────────────────
+
+    /**
+     * Lightweight classification using DeviceStatusInfo + FaultData.
+     * @param {Object} statusInfo - DeviceStatusInfo record
+     * @param {Object[]} faults - FaultData for this device
+     * @param {Object} device - Device from cache
+     * @returns {{ issues: Object[], primaryIssue: string, severity: string, healthScore: number }}
+     */
+    function classifyDevice(statusInfo, faults, device) {
+        var issues = [];
+        faults = faults || [];
+
+        var isCommunicating = statusInfo.isDeviceCommunicating;
+        var offlineH = hoursAgo(statusInfo.dateTime);
+
+        // Offline
+        if (!isCommunicating) {
+            if (offlineH > C.OfflineHours.EXTENDED) {
+                issues.push({ category: C.Category.OFFLINE, severity: C.Severity.CRITICAL,
+                    label: "Offline > 72h" });
+            } else if (offlineH > C.OfflineHours.NORMAL_SLEEP) {
+                issues.push({ category: C.Category.OFFLINE, severity: C.Severity.WARNING,
+                    label: "Offline > 24h" });
+            }
+        }
+
+        // Check fault codes
+        var codes = faultCodesForDevice(faults);
+        if (codes.some(function (c) { return C.HARDWARE_FAULT_CODES.indexOf(c) !== -1; })) {
+            issues.push({ category: C.Category.HARDWARE, severity: C.Severity.CRITICAL,
+                label: "Hardware Failure" });
+        }
+        if (codes.indexOf(135) !== -1) {
+            issues.push({ category: C.Category.POWER, severity: C.Severity.WARNING,
+                label: "Low Battery" });
+        }
+        if (codes.indexOf(287) !== -1) {
+            issues.push({ category: C.Category.INSTALLATION, severity: C.Severity.WARNING,
+                label: "Loose Install" });
+        }
+        if (codes.some(function (c) { return C.OEM_FAULT_CODES.indexOf(c) !== -1; })) {
+            issues.push({ category: C.Category.OEM, severity: C.Severity.INFO,
+                label: "OEM Issue" });
+        }
+
+        // Firmware mismatch
+        if (device && device.parameterVersion != null && device.parameterVersionOnDevice != null &&
+            device.parameterVersion !== device.parameterVersionOnDevice) {
+            issues.push({ category: C.Category.FIRMWARE, severity: C.Severity.INFO,
+                label: "Firmware Pending" });
+        }
+
+        // GPS — position stuck at 0,0 or very old
+        if (statusInfo.latitude === 0 && statusInfo.longitude === 0 && isCommunicating) {
+            issues.push({ category: C.Category.GPS, severity: C.Severity.WARNING,
+                label: "GPS Issue" });
+        }
+
+        // Determine primary issue and overall severity
+        var severityOrder = [C.Severity.CRITICAL, C.Severity.WARNING, C.Severity.INFO];
+        var primaryIssue = C.Category.HEALTHY;
+        var severity = C.Severity.HEALTHY;
+
+        for (var s = 0; s < severityOrder.length; s++) {
+            for (var i = 0; i < issues.length; i++) {
+                if (issues[i].severity === severityOrder[s]) {
+                    primaryIssue = issues[i].category;
+                    severity = issues[i].severity;
+                    s = severityOrder.length; // break outer
+                    break;
+                }
+            }
+        }
+
+        var healthScore = computeHealthScore(issues, offlineH, isCommunicating);
+
+        return {
+            issues: issues,
+            primaryIssue: primaryIssue,
+            severity: severity,
+            healthScore: healthScore
+        };
+    }
+
+    // ── Full drill-down analysis ───────────────────────────────────────
+
+    /**
+     * Full decision-tree analysis using StatusData + LogRecords + FaultData.
+     * @param {Object} device - Device from cache
+     * @param {Object} statusInfo - DeviceStatusInfo record
+     * @param {Object} drillData - { statusData, logRecords, faults } from healthService
+     * @returns {{ rootCauses: Object[], healthScore: number, issues: Object[] }}
+     */
+    function analyzeDevice(device, statusInfo, drillData) {
+        var sd = drillData.statusData;
+        var faults = drillData.faults || [];
+        var logRecords = drillData.logRecords || [];
+        var rootCauses = [];
+        var issues = [];
+        var rank = 0;
+        var isCommunicating = statusInfo ? statusInfo.isDeviceCommunicating : false;
+        var offlineH = statusInfo ? hoursAgo(statusInfo.dateTime) : Infinity;
+
+        // 1. Unplugged (95%)
+        var unpluggedData = sd[C.Diagnostics.UNPLUGGED];
+        if (unpluggedData && unpluggedData.length > 0) {
+            var lastUnplug = latestValue(unpluggedData);
+            if (lastUnplug && lastUnplug > 0) {
+                rank++;
+                rootCauses.push({
+                    rank: rank,
+                    category: C.Category.UNPLUGGED,
+                    confidence: 95,
+                    severity: C.Severity.CRITICAL,
+                    explanation: "The device has reported an unplugged event. The GO device connector may have been removed from the vehicle\u2019s OBD-II port or power source.",
+                    actions: [
+                        "Verify the GO device is firmly seated in the OBD-II port.",
+                        "Check for physical damage to the connector or port.",
+                        "Inspect the wiring harness if a T-harness is used.",
+                        "If recently serviced, confirm the device was reconnected."
+                    ]
+                });
+                issues.push({ category: C.Category.UNPLUGGED, severity: C.Severity.CRITICAL, label: "Unplugged" });
+            }
+        }
+
+        // 2. Hardware Failure / RMA (90%)
+        var hardwareFaults = faults.filter(function (f) {
+            var fmId = f.failureMode ? parseInt(f.failureMode.id, 10) : NaN;
+            var dId = f.diagnostic ? parseInt(f.diagnostic.id, 10) : NaN;
+            return C.HARDWARE_FAULT_CODES.indexOf(fmId) !== -1 || C.HARDWARE_FAULT_CODES.indexOf(dId) !== -1;
+        });
+        var flashErrors = sd[C.Diagnostics.FLASH_ERROR];
+        var hasFlashErrors = flashErrors && flashErrors.length > 0 && latestValue(flashErrors) > 0;
+
+        if (hardwareFaults.length > 0 || hasFlashErrors) {
+            rank++;
+            var hwExplanation = "Hardware-level faults detected.";
+            if (hasFlashErrors) {
+                hwExplanation += " Flash memory errors indicate possible internal component failure.";
+            }
+            if (hardwareFaults.length > 0) {
+                hwExplanation += " Fault codes suggest the device may require replacement (RMA).";
+            }
+            rootCauses.push({
+                rank: rank,
+                category: C.Category.HARDWARE,
+                confidence: 90,
+                severity: C.Severity.CRITICAL,
+                explanation: hwExplanation,
+                actions: [
+                    "Contact Geotab support to initiate an RMA (Return Merchandise Authorization).",
+                    "Check for water damage or physical tampering on the device.",
+                    "Document the fault codes for the support case.",
+                    "Prepare a replacement device for swap."
+                ]
+            });
+            issues.push({ category: C.Category.HARDWARE, severity: C.Severity.CRITICAL, label: "Hardware Failure" });
+        }
+
+        // 3. Power / Voltage (75-90%)
+        var voltageData = sd[C.Diagnostics.VOLTAGE];
+        var crankingData = sd[C.Diagnostics.CRANKING_VOLTAGE];
+        var hasLowVoltFault = faults.some(function (f) {
+            var fmId = f.failureMode ? parseInt(f.failureMode.id, 10) : NaN;
+            return fmId === 135;
+        });
+        var lastVoltage = latestValue(voltageData);
+        var lastCranking = latestValue(crankingData);
+
+        if (hasLowVoltFault || (lastVoltage !== null && lastVoltage < C.Voltage.WARNING)) {
+            rank++;
+            var voltConf = 75;
+            var voltSev = C.Severity.WARNING;
+            var voltExpl = "";
+
+            if (lastVoltage !== null && lastVoltage < C.Voltage.DEAD) {
+                voltConf = 90;
+                voltSev = C.Severity.CRITICAL;
+                voltExpl = "Vehicle battery voltage is critically low (" + lastVoltage.toFixed(1) + "V). The battery may be dead or disconnected.";
+            } else if (lastVoltage !== null && lastVoltage < C.Voltage.LOW) {
+                voltConf = 85;
+                voltSev = C.Severity.CRITICAL;
+                voltExpl = "Vehicle battery voltage is very low (" + lastVoltage.toFixed(1) + "V). The battery is likely failing or being drained.";
+            } else if (lastVoltage !== null) {
+                voltExpl = "Vehicle battery voltage is below normal (" + lastVoltage.toFixed(1) + "V). This may indicate a weak battery or parasitic drain.";
+            } else {
+                voltExpl = "Low voltage fault code detected, but no recent voltage readings are available.";
+            }
+
+            if (lastCranking !== null && lastCranking < C.Voltage.LOW) {
+                voltExpl += " Cranking voltage was also low (" + lastCranking.toFixed(1) + "V), suggesting battery or starter issues.";
+            }
+
+            rootCauses.push({
+                rank: rank,
+                category: C.Category.POWER,
+                confidence: voltConf,
+                severity: voltSev,
+                explanation: voltExpl,
+                actions: [
+                    "Test the vehicle battery with a multimeter or battery tester.",
+                    "Check for parasitic drains (aftermarket accessories left on).",
+                    "Verify the alternator is charging properly.",
+                    "If the vehicle is stored long-term, consider a battery maintainer."
+                ]
+            });
+            issues.push({ category: C.Category.POWER, severity: voltSev, label: "Low Battery" });
+        }
+
+        // 4. Installation / Harness (75%)
+        var canInitFail = sd[C.Diagnostics.CAN_INIT_FAIL];
+        var canShort = sd[C.Diagnostics.CAN_SHORT];
+        var canDisabled = sd[C.Diagnostics.CAN_DISABLED];
+        var hasInstallFault = faults.some(function (f) {
+            var fmId = f.failureMode ? parseInt(f.failureMode.id, 10) : NaN;
+            return fmId === 287;
+        });
+        var hasCanIssue = (canInitFail && canInitFail.length > 0 && latestValue(canInitFail) > 0) ||
+                          (canShort && canShort.length > 0 && latestValue(canShort) > 0);
+
+        if (hasInstallFault || hasCanIssue) {
+            rank++;
+            var instExpl = "Installation issues detected.";
+            if (hasInstallFault) {
+                instExpl += " The device reported a bad-install fault, suggesting it is not properly connected to the vehicle.";
+            }
+            if (hasCanIssue) {
+                instExpl += " CAN bus communication problems indicate a wiring or connector issue.";
+            }
+
+            rootCauses.push({
+                rank: rank,
+                category: C.Category.INSTALLATION,
+                confidence: 75,
+                severity: C.Severity.WARNING,
+                explanation: instExpl,
+                actions: [
+                    "Re-seat the GO device in the OBD-II port.",
+                    "Inspect the T-harness connections for corrosion or loose pins.",
+                    "Verify the correct harness type is used for this vehicle.",
+                    "Check that CAN bus wiring is not pinched or damaged."
+                ]
+            });
+            issues.push({ category: C.Category.INSTALLATION, severity: C.Severity.WARNING, label: "Loose Install" });
+        }
+
+        // 5. GPS Issues (60-90%)
+        var gpsNotResp = sd[C.Diagnostics.GPS_NOT_RESPONDING];
+        var gpsUnplugged = sd[C.Diagnostics.GPS_ANTENNA_UNPLUGGED];
+        var gpsShort = sd[C.Diagnostics.GPS_ANTENNA_SHORT];
+
+        var hasGpsAntennaFault = (gpsUnplugged && gpsUnplugged.length > 0 && latestValue(gpsUnplugged) > 0) ||
+                                (gpsShort && gpsShort.length > 0 && latestValue(gpsShort) > 0);
+        var hasGpsNotResponding = gpsNotResp && gpsNotResp.length > 0 && latestValue(gpsNotResp) > 0;
+
+        // Check for communicating-but-no-GPS-updates pattern
+        var gpsStale = false;
+        if (isCommunicating && logRecords.length > 0) {
+            var sortedLogs = logRecords.slice().sort(function (a, b) {
+                return new Date(b.dateTime) - new Date(a.dateTime);
+            });
+            var lastLog = new Date(sortedLogs[0].dateTime);
+            var logAgeH = (Date.now() - lastLog.getTime()) / (1000 * 60 * 60);
+            if (logAgeH > 4) {
+                gpsStale = true;
+            }
+        }
+
+        if (hasGpsAntennaFault || hasGpsNotResponding || gpsStale) {
+            rank++;
+            var gpsConf = 60;
+            var gpsSev = C.Severity.WARNING;
+            var gpsExpl = "";
+
+            if (hasGpsAntennaFault) {
+                gpsConf = 90;
+                gpsSev = C.Severity.CRITICAL;
+                gpsExpl = "GPS antenna fault detected (unplugged or short circuit). The device cannot acquire satellite position.";
+            } else if (hasGpsNotResponding) {
+                gpsConf = 80;
+                gpsExpl = "The GPS module is not responding. This may be a hardware issue or severe signal blockage.";
+            } else {
+                gpsExpl = "The device is communicating but GPS data is stale. The device may be in a location with poor sky visibility (underground parking, dense urban canyon).";
+            }
+
+            rootCauses.push({
+                rank: rank,
+                category: C.Category.GPS,
+                confidence: gpsConf,
+                severity: gpsSev,
+                explanation: gpsExpl,
+                actions: [
+                    "Verify the GPS antenna connection on the device.",
+                    "Move the vehicle to an open-sky area and check for GPS lock.",
+                    "Check if a metallic windshield tint is blocking GPS signals.",
+                    "If using an external antenna, inspect the cable and mount."
+                ]
+            });
+            issues.push({ category: C.Category.GPS, severity: gpsSev, label: "GPS Issue" });
+        }
+
+        // 6. Cellular / Connectivity (55-85%)
+        var rssiData = sd[C.Diagnostics.CELLULAR_RSSI];
+        var intermittent = sd[C.Diagnostics.INTERMITTENT_CONNECTION];
+        var lastRSSI = latestValue(rssiData);
+        var hasIntermittent = intermittent && intermittent.length > 0 && latestValue(intermittent) > 0;
+
+        var cellIssue = false;
+        var cellConf = 55;
+        var cellSev = C.Severity.INFO;
+        var cellExpl = "";
+
+        if (lastRSSI !== null && lastRSSI < C.RSSI.NO_SIGNAL) {
+            cellIssue = true;
+            cellConf = 85;
+            cellSev = C.Severity.CRITICAL;
+            cellExpl = "Cellular signal is at no-signal level (" + lastRSSI + " dBm). The device cannot communicate with the server.";
+        } else if (lastRSSI !== null && lastRSSI < C.RSSI.POOR) {
+            cellIssue = true;
+            cellConf = 70;
+            cellSev = C.Severity.WARNING;
+            cellExpl = "Cellular signal is poor (" + lastRSSI + " dBm). Data uploads may be delayed or incomplete.";
+        } else if (hasIntermittent) {
+            cellIssue = true;
+            cellConf = 65;
+            cellSev = C.Severity.WARNING;
+            cellExpl = "Intermittent connectivity detected. The device is cycling between connected and disconnected states.";
+        } else if (!isCommunicating && offlineH > C.OfflineHours.NORMAL_SLEEP) {
+            cellIssue = true;
+            cellConf = 60;
+            cellSev = offlineH > C.OfflineHours.EXTENDED ? C.Severity.CRITICAL : C.Severity.WARNING;
+            cellExpl = "The device has been offline for " + Math.round(offlineH) + " hours.";
+            if (offlineH > C.OfflineHours.EXTENDED) {
+                cellExpl += " Extended offline periods may indicate the vehicle is in a no-coverage area, the device has lost power, or there is a cellular modem issue.";
+            }
+        }
+
+        if (cellIssue) {
+            rank++;
+            rootCauses.push({
+                rank: rank,
+                category: C.Category.CELLULAR,
+                confidence: cellConf,
+                severity: cellSev,
+                explanation: cellExpl,
+                actions: [
+                    "Check the vehicle\u2019s typical operating area for cellular coverage.",
+                    "Verify the device\u2019s SIM card is properly seated.",
+                    "Try a power cycle by disconnecting and reconnecting the device.",
+                    "If in a known dead zone, wait for the vehicle to move to coverage."
+                ]
+            });
+            issues.push({ category: C.Category.CELLULAR, severity: cellSev, label: "Connectivity Issue" });
+        }
+
+        // 7. Firmware (95%)
+        var bootloaderFail = sd[C.Diagnostics.BOOTLOADER_FAIL];
+        var hasBootFail = bootloaderFail && bootloaderFail.length > 0 && latestValue(bootloaderFail) > 0;
+        var hasFwMismatch = device && device.parameterVersion != null &&
+                            device.parameterVersionOnDevice != null &&
+                            device.parameterVersion !== device.parameterVersionOnDevice;
+
+        if (hasBootFail || hasFwMismatch) {
+            rank++;
+            var fwSev = hasBootFail ? C.Severity.WARNING : C.Severity.INFO;
+            var fwExpl = "";
+            if (hasBootFail) {
+                fwExpl = "A bootloader update has failed on this device. The device may not be running the expected firmware version.";
+            } else {
+                fwExpl = "The device has a pending configuration update (parameter version " +
+                    device.parameterVersion + " vs on-device " + device.parameterVersionOnDevice +
+                    "). It will apply on next communication.";
+            }
+
+            rootCauses.push({
+                rank: rank,
+                category: C.Category.FIRMWARE,
+                confidence: 95,
+                severity: fwSev,
+                explanation: fwExpl,
+                actions: [
+                    "If bootloader failed, contact Geotab support for a manual firmware push.",
+                    "Ensure the device has stable power and connectivity for firmware updates.",
+                    "For pending config, the device will auto-update on next check-in.",
+                    "Avoid making additional config changes until the current update completes."
+                ]
+            });
+            issues.push({ category: C.Category.FIRMWARE, severity: fwSev, label: hasBootFail ? "Firmware Failure" : "Firmware Pending" });
+        }
+
+        // 8. OEM Issues (85%)
+        var oemFaults = faults.filter(function (f) {
+            var fmId = f.failureMode ? parseInt(f.failureMode.id, 10) : NaN;
+            return C.OEM_FAULT_CODES.indexOf(fmId) !== -1;
+        });
+
+        if (oemFaults.length > 0) {
+            rank++;
+            rootCauses.push({
+                rank: rank,
+                category: C.Category.OEM,
+                confidence: 85,
+                severity: C.Severity.INFO,
+                explanation: "OEM-related fault codes (SWC) detected. These typically relate to vehicle-specific steering-wheel-control or aftermarket integration issues.",
+                actions: [
+                    "Check if aftermarket steering wheel controls are installed.",
+                    "Verify the T-harness is compatible with this vehicle make/model.",
+                    "Consult the Geotab vehicle compatibility list for known issues.",
+                    "These faults generally do not affect core tracking functionality."
+                ]
+            });
+            issues.push({ category: C.Category.OEM, severity: C.Severity.INFO, label: "OEM Issue" });
+        }
+
+        var healthScore = computeHealthScore(issues, offlineH, isCommunicating);
+
+        return {
+            rootCauses: rootCauses,
+            healthScore: healthScore,
+            issues: issues
+        };
+    }
+
+    // ── Health score computation ────────────────────────────────────────
+
+    function computeHealthScore(issues, offlineH, isCommunicating) {
+        var score = 100;
+
+        issues.forEach(function (issue) {
+            var deduction = C.ScoreDeductions[issue.severity] || 0;
+            score -= deduction;
+        });
+
+        // Offline duration penalty
+        if (!isCommunicating && offlineH > C.OfflineHours.NORMAL_SLEEP) {
+            var extraH = offlineH - C.OfflineHours.NORMAL_SLEEP;
+            score -= Math.min(20, Math.round(extraH / 24) * 5);
+        }
+
+        return Math.max(0, Math.min(100, score));
+    }
+
+    return {
+        classifyDevice: classifyDevice,
+        analyzeDevice: analyzeDevice
+    };
+})();
+
+</script>
+    <script>
+/**
+ * diagnosticTimeline.js — Canvas-based line charts for voltage and RSSI trends.
+ * No external charting library — pure canvas rendering.
+ */
+var DHD = DHD || {};
+
+DHD.DiagnosticTimeline = (function () {
+    "use strict";
+
+    var C = DHD.Constants;
+    var PADDING = { top: 20, right: 20, bottom: 40, left: 50 };
+    var COLORS = {
+        line: "#1976d2",
+        point: "#1565c0",
+        grid: "#e0e0e0",
+        text: "#616161",
+        thresholdCritical: "rgba(244, 67, 54, 0.6)",
+        thresholdWarning: "rgba(255, 152, 0, 0.6)",
+        thresholdOk: "rgba(76, 175, 80, 0.3)"
+    };
+
+    /**
+     * Render a voltage chart on a canvas element.
+     * @param {string} canvasId - DOM id of the canvas
+     * @param {Object[]} statusRecords - StatusData records for voltage
+     */
+    function renderVoltageChart(canvasId, statusRecords) {
+        var thresholds = [
+            { value: C.Voltage.DEAD, color: COLORS.thresholdCritical, label: "Dead (7V)" },
+            { value: C.Voltage.LOW, color: COLORS.thresholdWarning, label: "Low (9V)" },
+            { value: C.Voltage.WARNING, color: COLORS.thresholdWarning, label: "Warning (11V)" }
+        ];
+        renderChart(canvasId, statusRecords, thresholds, "Voltage (V)", 0, 16);
+    }
+
+    /**
+     * Render an RSSI chart on a canvas element.
+     * @param {string} canvasId - DOM id of the canvas
+     * @param {Object[]} statusRecords - StatusData records for RSSI
+     */
+    function renderRSSIChart(canvasId, statusRecords) {
+        var thresholds = [
+            { value: C.RSSI.POOR, color: COLORS.thresholdWarning, label: "Poor (-95)" },
+            { value: C.RSSI.FAIR, color: COLORS.thresholdOk, label: "Fair (-85)" }
+        ];
+        renderChart(canvasId, statusRecords, thresholds, "RSSI (dBm)", -120, -50);
+    }
+
+    /**
+     * Core chart renderer.
+     */
+    function renderChart(canvasId, records, thresholds, yLabel, yMin, yMax) {
+        var canvas = document.getElementById(canvasId);
+        if (!canvas) { return; }
+
+        var ctx = canvas.getContext("2d");
+        var dpr = window.devicePixelRatio || 1;
+        var rect = canvas.parentElement.getBoundingClientRect();
+        var w = rect.width || 400;
+        var h = 200;
+
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width = w + "px";
+        canvas.style.height = h + "px";
+        ctx.scale(dpr, dpr);
+
+        var plotW = w - PADDING.left - PADDING.right;
+        var plotH = h - PADDING.top - PADDING.bottom;
+
+        // Clear
+        ctx.clearRect(0, 0, w, h);
+
+        // No data
+        if (!records || records.length === 0) {
+            ctx.fillStyle = C.Severity ? "#9e9e9e" : "#999";
+            ctx.font = "13px -apple-system, BlinkMacSystemFont, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("No data available", w / 2, h / 2);
+            return;
+        }
+
+        // Sort by date
+        var sorted = records.slice().sort(function (a, b) {
+            return new Date(a.dateTime) - new Date(b.dateTime);
+        });
+
+        var tMin = new Date(sorted[0].dateTime).getTime();
+        var tMax = new Date(sorted[sorted.length - 1].dateTime).getTime();
+        if (tMin === tMax) { tMax = tMin + 1; }
+
+        // Scale functions
+        function xScale(t) {
+            return PADDING.left + ((t - tMin) / (tMax - tMin)) * plotW;
+        }
+        function yScale(v) {
+            return PADDING.top + plotH - ((v - yMin) / (yMax - yMin)) * plotH;
+        }
+
+        // Grid lines (horizontal)
+        ctx.strokeStyle = COLORS.grid;
+        ctx.lineWidth = 0.5;
+        var ySteps = 5;
+        var yStep = (yMax - yMin) / ySteps;
+        for (var yi = 0; yi <= ySteps; yi++) {
+            var yv = yMin + yi * yStep;
+            var yy = yScale(yv);
+            ctx.beginPath();
+            ctx.moveTo(PADDING.left, yy);
+            ctx.lineTo(PADDING.left + plotW, yy);
+            ctx.stroke();
+
+            // Y-axis labels
+            ctx.fillStyle = COLORS.text;
+            ctx.font = "10px -apple-system, BlinkMacSystemFont, sans-serif";
+            ctx.textAlign = "right";
+            ctx.fillText(yv.toFixed(0), PADDING.left - 6, yy + 3);
+        }
+
+        // Threshold lines
+        thresholds.forEach(function (t) {
+            if (t.value >= yMin && t.value <= yMax) {
+                var ty = yScale(t.value);
+                ctx.strokeStyle = t.color;
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([5, 3]);
+                ctx.beginPath();
+                ctx.moveTo(PADDING.left, ty);
+                ctx.lineTo(PADDING.left + plotW, ty);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Label
+                ctx.fillStyle = t.color;
+                ctx.font = "9px -apple-system, BlinkMacSystemFont, sans-serif";
+                ctx.textAlign = "left";
+                ctx.fillText(t.label, PADDING.left + plotW + 2, ty + 3);
+            }
+        });
+
+        // Data line
+        ctx.strokeStyle = COLORS.line;
+        ctx.lineWidth = 1.5;
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        sorted.forEach(function (rec, i) {
+            var x = xScale(new Date(rec.dateTime).getTime());
+            var y = yScale(rec.data);
+            if (i === 0) { ctx.moveTo(x, y); }
+            else { ctx.lineTo(x, y); }
+        });
+        ctx.stroke();
+
+        // Data points (only if < 100 points)
+        if (sorted.length < 100) {
+            ctx.fillStyle = COLORS.point;
+            sorted.forEach(function (rec) {
+                var x = xScale(new Date(rec.dateTime).getTime());
+                var y = yScale(rec.data);
+                ctx.beginPath();
+                ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        // X-axis date labels (5 evenly spaced)
+        ctx.fillStyle = COLORS.text;
+        ctx.font = "10px -apple-system, BlinkMacSystemFont, sans-serif";
+        ctx.textAlign = "center";
+        var xSteps = Math.min(5, sorted.length);
+        for (var xi = 0; xi < xSteps; xi++) {
+            var ratio = xi / (xSteps - 1 || 1);
+            var tVal = tMin + ratio * (tMax - tMin);
+            var dt = new Date(tVal);
+            var label = (dt.getMonth() + 1) + "/" + dt.getDate();
+            var xPos = xScale(tVal);
+            ctx.fillText(label, xPos, h - PADDING.bottom + 16);
+        }
+
+        // Y-axis title
+        ctx.save();
+        ctx.translate(12, PADDING.top + plotH / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = COLORS.text;
+        ctx.font = "11px -apple-system, BlinkMacSystemFont, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(yLabel, 0, 0);
+        ctx.restore();
+    }
+
+    return {
+        renderVoltageChart: renderVoltageChart,
+        renderRSSIChart: renderRSSIChart
+    };
+})();
+
+</script>
+    <script>
+/**
+ * fleetDashboard.js — Summary tiles + sortable/filterable device table.
+ */
+var DHD = DHD || {};
+
+DHD.FleetDashboard = (function () {
+    "use strict";
+
+    var C = DHD.Constants;
+    var _classifications = [];  // cached fleet results
+    var _activeFilter = null;   // tile filter
+    var _searchText = "";
+    var _sortCol = "severity";
+    var _sortAsc = true;
+    var _onDeviceClick = null;
+
+    // ── Tile definitions ───────────────────────────────────────────────
+
+    var TILES = [
+        { key: "total",     label: "Total",            icon: "devices",     filterFn: function () { return true; } },
+        { key: "healthy",   label: "Healthy",          icon: "check",       filterFn: function (c) { return c.severity === C.Severity.HEALTHY; } },
+        { key: "offline",   label: "Offline",          icon: "cloud_off",   filterFn: function (c) { return c.issues.some(function (i) { return i.category === C.Category.OFFLINE; }); } },
+        { key: "battery",   label: "Low Battery",      icon: "battery_alert", filterFn: function (c) { return c.primaryIssue === C.Category.POWER; } },
+        { key: "install",   label: "Loose Install",    icon: "build",       filterFn: function (c) { return c.primaryIssue === C.Category.INSTALLATION; } },
+        { key: "gps",       label: "GPS Issues",       icon: "gps_off",     filterFn: function (c) { return c.primaryIssue === C.Category.GPS; } },
+        { key: "hardware",  label: "Hardware Failure",  icon: "error",       filterFn: function (c) { return c.primaryIssue === C.Category.HARDWARE; } },
+        { key: "unplugged", label: "Unplugged",         icon: "power_off",   filterFn: function (c) { return c.primaryIssue === C.Category.UNPLUGGED; } }
+    ];
+
+    /**
+     * Render the fleet dashboard with the given classified data.
+     * @param {Object[]} classifications - Array of { device, statusInfo, classification }
+     * @param {Function} onDeviceClick - callback(deviceId)
+     */
+    function render(classifications, onDeviceClick) {
+        _classifications = classifications;
+        _onDeviceClick = onDeviceClick;
+        _activeFilter = null;
+        _searchText = "";
+
+        renderTiles();
+        renderTable();
+        bindEvents();
+    }
+
+    // ── Tiles ──────────────────────────────────────────────────────────
+
+    function renderTiles() {
+        var container = document.getElementById("dhdTiles");
+        if (!container) { return; }
+
+        var html = "";
+        TILES.forEach(function (tile) {
+            var count = _classifications.filter(tile.filterFn).length;
+            var colorClass = "dhd-tile";
+            if (tile.key === "healthy") { colorClass += " dhd-tile--healthy"; }
+            else if (tile.key === "total") { colorClass += " dhd-tile--total"; }
+            else if (count > 0) { colorClass += " dhd-tile--issue"; }
+
+            var activeClass = (_activeFilter === tile.key) ? " dhd-tile--active" : "";
+
+            html += '<div class="' + colorClass + activeClass + '" data-tile="' + tile.key + '">' +
+                '<div class="dhd-tile__count">' + count + '</div>' +
+                '<div class="dhd-tile__label">' + tile.label + '</div>' +
+                '</div>';
+        });
+
+        container.innerHTML = html;
+    }
+
+    // ── Table ──────────────────────────────────────────────────────────
+
+    function renderTable() {
+        var tbody = document.getElementById("dhdTableBody");
+        if (!tbody) { return; }
+
+        var filtered = getFilteredData();
+        filtered = sortData(filtered);
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="dhd-empty">No devices match the current filters.</td></tr>';
+            return;
+        }
+
+        var html = "";
+        filtered.forEach(function (item) {
+            var cls = item.classification;
+            var device = item.device;
+            var si = item.statusInfo;
+            var sevClass = "dhd-severity--" + cls.severity;
+            var barWidth = cls.healthScore + "%";
+            var barClass = "dhd-health-bar__fill";
+            if (cls.healthScore < 40) { barClass += " dhd-health-bar__fill--critical"; }
+            else if (cls.healthScore < 70) { barClass += " dhd-health-bar__fill--warning"; }
+
+            var lastComm = si.dateTime ? formatDate(si.dateTime) : "N/A";
+            var issueLbl = cls.primaryIssue === C.Category.HEALTHY ? "Healthy" : (cls.issues.length > 0 ? cls.issues[0].label : "Unknown");
+
+            html += '<tr class="dhd-table__row" data-device-id="' + device.id + '">' +
+                '<td class="dhd-table__cell">' + escHtml(device.name) + '</td>' +
+                '<td class="dhd-table__cell">' + escHtml(device.serialNumber || "—") + '</td>' +
+                '<td class="dhd-table__cell"><span class="dhd-badge ' + sevClass + '">' + capitalize(cls.severity) + '</span></td>' +
+                '<td class="dhd-table__cell">' + escHtml(issueLbl) + '</td>' +
+                '<td class="dhd-table__cell"><div class="dhd-health-bar"><div class="' + barClass + '" style="width:' + barWidth + '"></div><span class="dhd-health-bar__text">' + cls.healthScore + '</span></div></td>' +
+                '<td class="dhd-table__cell">' + lastComm + '</td>' +
+                '<td class="dhd-table__cell"><button class="dhd-btn dhd-btn--small dhd-btn--diagnose" data-device-id="' + device.id + '">Diagnose</button></td>' +
+                '</tr>';
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    function getFilteredData() {
+        var data = _classifications;
+
+        // Tile filter
+        if (_activeFilter && _activeFilter !== "total") {
+            var tile = TILES.find(function (t) { return t.key === _activeFilter; });
+            if (tile) {
+                data = data.filter(function (item) {
+                    return tile.filterFn(item.classification);
+                });
+            }
+        }
+
+        // Search text
+        if (_searchText) {
+            var q = _searchText.toLowerCase();
+            data = data.filter(function (item) {
+                return (item.device.name && item.device.name.toLowerCase().indexOf(q) !== -1) ||
+                       (item.device.serialNumber && item.device.serialNumber.toLowerCase().indexOf(q) !== -1);
+            });
+        }
+
+        return data;
+    }
+
+    function sortData(data) {
+        var col = _sortCol;
+        var asc = _sortAsc;
+
+        data.sort(function (a, b) {
+            var va, vb;
+            switch (col) {
+                case "name":
+                    va = (a.device.name || "").toLowerCase();
+                    vb = (b.device.name || "").toLowerCase();
+                    break;
+                case "serial":
+                    va = (a.device.serialNumber || "").toLowerCase();
+                    vb = (b.device.serialNumber || "").toLowerCase();
+                    break;
+                case "severity":
+                    va = severityRank(a.classification.severity);
+                    vb = severityRank(b.classification.severity);
+                    break;
+                case "category":
+                    va = a.classification.primaryIssue;
+                    vb = b.classification.primaryIssue;
+                    break;
+                case "health":
+                    va = a.classification.healthScore;
+                    vb = b.classification.healthScore;
+                    break;
+                case "lastComm":
+                    va = a.statusInfo.dateTime ? new Date(a.statusInfo.dateTime).getTime() : 0;
+                    vb = b.statusInfo.dateTime ? new Date(b.statusInfo.dateTime).getTime() : 0;
+                    break;
+                default:
+                    va = 0; vb = 0;
+            }
+            if (va < vb) { return asc ? -1 : 1; }
+            if (va > vb) { return asc ? 1 : -1; }
+            return 0;
+        });
+
+        return data;
+    }
+
+    function severityRank(s) {
+        switch (s) {
+            case C.Severity.CRITICAL: return 0;
+            case C.Severity.WARNING: return 1;
+            case C.Severity.INFO: return 2;
+            case C.Severity.HEALTHY: return 3;
+            default: return 4;
+        }
+    }
+
+    // ── Events ─────────────────────────────────────────────────────────
+
+    function bindEvents() {
+        // Tile clicks
+        var tilesContainer = document.getElementById("dhdTiles");
+        if (tilesContainer) {
+            tilesContainer.addEventListener("click", function (e) {
+                var tile = e.target.closest("[data-tile]");
+                if (tile) {
+                    var key = tile.getAttribute("data-tile");
+                    _activeFilter = (_activeFilter === key) ? null : key;
+                    renderTiles();
+                    renderTable();
+                }
+            });
+        }
+
+        // Table row / diagnose button clicks
+        var tbody = document.getElementById("dhdTableBody");
+        if (tbody) {
+            tbody.addEventListener("click", function (e) {
+                var btn = e.target.closest("[data-device-id]");
+                if (btn && _onDeviceClick) {
+                    _onDeviceClick(btn.getAttribute("data-device-id"));
+                }
+            });
+        }
+
+        // Search
+        var searchInput = document.getElementById("dhdSearch");
+        if (searchInput) {
+            searchInput.addEventListener("input", function () {
+                _searchText = searchInput.value;
+                renderTable();
+            });
+        }
+
+        // Column sort
+        var headers = document.querySelectorAll("[data-sort]");
+        headers.forEach(function (header) {
+            header.addEventListener("click", function () {
+                var col = header.getAttribute("data-sort");
+                if (_sortCol === col) {
+                    _sortAsc = !_sortAsc;
+                } else {
+                    _sortCol = col;
+                    _sortAsc = true;
+                }
+                updateSortIndicators();
+                renderTable();
+            });
+        });
+    }
+
+    function updateSortIndicators() {
+        var headers = document.querySelectorAll("[data-sort]");
+        headers.forEach(function (h) {
+            h.classList.remove("dhd-sort--asc", "dhd-sort--desc");
+            if (h.getAttribute("data-sort") === _sortCol) {
+                h.classList.add(_sortAsc ? "dhd-sort--asc" : "dhd-sort--desc");
+            }
+        });
+    }
+
+    // ── Utilities ──────────────────────────────────────────────────────
+
+    function formatDate(dateStr) {
+        if (!dateStr) { return "N/A"; }
+        var d = new Date(dateStr);
+        var now = new Date();
+        var diffH = (now - d) / (1000 * 60 * 60);
+
+        if (diffH < 1) { return Math.round(diffH * 60) + "m ago"; }
+        if (diffH < 24) { return Math.round(diffH) + "h ago"; }
+        if (diffH < 720) { return Math.round(diffH / 24) + "d ago"; }
+        return (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear();
+    }
+
+    function escHtml(str) {
+        var div = document.createElement("div");
+        div.appendChild(document.createTextNode(str || ""));
+        return div.innerHTML;
+    }
+
+    function capitalize(s) {
+        return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
+    }
+
+    return {
+        render: render
+    };
+})();
+
+</script>
+    <script>
+/**
+ * deviceDiagnostics.js — Single-device drill-down panel.
+ * Shows health score, root causes, charts, fault history, device info.
+ */
+var DHD = DHD || {};
+
+DHD.DeviceDiagnostics = (function () {
+    "use strict";
+
+    var C = DHD.Constants;
+
+    /**
+     * Render the drill-down view for a single device.
+     * @param {Object} device - Device from cache
+     * @param {Object} statusInfo - DeviceStatusInfo
+     * @param {Object} analysis - result from rootCauseEngine.analyzeDevice()
+     * @param {Object} drillData - raw drill-down data (statusData, faults)
+     * @param {Function} onBack - callback to return to fleet view
+     */
+    function render(device, statusInfo, analysis, drillData, onBack) {
+        renderHeader(device, onBack);
+        renderHealthScore(analysis.healthScore);
+        renderActiveIssues(analysis.issues);
+        renderRootCauses(analysis.rootCauses);
+        renderCharts(drillData.statusData);
+        renderFaultHistory(drillData.faults);
+        renderDeviceInfo(device, statusInfo);
+    }
+
+    // ── Header ─────────────────────────────────────────────────────────
+
+    function renderHeader(device, onBack) {
+        var el = document.getElementById("dhdDrillHeader");
+        if (!el) { return; }
+
+        el.innerHTML =
+            '<button class="dhd-btn dhd-btn--back" id="dhdBackBtn">&larr; Back to Fleet</button>' +
+            '<div class="dhd-drill-title">' +
+                '<h2>' + escHtml(device.name) + '</h2>' +
+                '<span class="dhd-drill-serial">S/N: ' + escHtml(device.serialNumber || "N/A") +
+                ' &middot; Firmware: ' + escHtml(formatFirmware(device)) + '</span>' +
+            '</div>';
+
+        document.getElementById("dhdBackBtn").addEventListener("click", function () {
+            if (onBack) { onBack(); }
+        });
+    }
+
+    // ── Health Score ───────────────────────────────────────────────────
+
+    function renderHealthScore(score) {
+        var el = document.getElementById("dhdHealthScore");
+        if (!el) { return; }
+
+        var colorClass = "dhd-score--healthy";
+        if (score < 40) { colorClass = "dhd-score--critical"; }
+        else if (score < 70) { colorClass = "dhd-score--warning"; }
+
+        el.innerHTML =
+            '<div class="dhd-score ' + colorClass + '">' +
+                '<div class="dhd-score__value">' + score + '</div>' +
+                '<div class="dhd-score__label">Health Score</div>' +
+            '</div>';
+    }
+
+    // ── Active Issues ──────────────────────────────────────────────────
+
+    function renderActiveIssues(issues) {
+        var el = document.getElementById("dhdActiveIssues");
+        if (!el) { return; }
+
+        if (issues.length === 0) {
+            el.innerHTML = '<div class="dhd-badge dhd-severity--healthy">No Active Issues</div>';
+            return;
+        }
+
+        var html = "";
+        issues.forEach(function (issue) {
+            html += '<span class="dhd-badge dhd-severity--' + issue.severity + '">' +
+                escHtml(issue.label) + '</span> ';
+        });
+        el.innerHTML = html;
+    }
+
+    // ── Root Cause Analysis ────────────────────────────────────────────
+
+    function renderRootCauses(rootCauses) {
+        var el = document.getElementById("dhdRootCauses");
+        if (!el) { return; }
+
+        if (rootCauses.length === 0) {
+            el.innerHTML = '<div class="dhd-empty-state">No issues detected. This device appears healthy.</div>';
+            return;
+        }
+
+        var html = "";
+        rootCauses.forEach(function (rc) {
+            html += '<div class="dhd-root-cause dhd-root-cause--' + rc.severity + '">' +
+                '<div class="dhd-root-cause__header">' +
+                    '<span class="dhd-root-cause__rank">#' + rc.rank + '</span>' +
+                    '<span class="dhd-root-cause__category">' + capitalize(rc.category) + '</span>' +
+                    '<span class="dhd-root-cause__confidence">' + rc.confidence + '% confidence</span>' +
+                    '<span class="dhd-badge dhd-severity--' + rc.severity + '">' + capitalize(rc.severity) + '</span>' +
+                '</div>' +
+                '<div class="dhd-root-cause__explanation">' + escHtml(rc.explanation) + '</div>' +
+                '<div class="dhd-root-cause__actions">' +
+                    '<strong>Recommended Actions:</strong><ul>';
+            rc.actions.forEach(function (action) {
+                html += '<li>' + escHtml(action) + '</li>';
+            });
+            html += '</ul></div></div>';
+        });
+
+        el.innerHTML = html;
+    }
+
+    // ── Charts ─────────────────────────────────────────────────────────
+
+    function renderCharts(statusData) {
+        // Slight delay so canvas elements are in the DOM
+        setTimeout(function () {
+            DHD.DiagnosticTimeline.renderVoltageChart("dhdVoltageChart",
+                statusData[C.Diagnostics.VOLTAGE]);
+            DHD.DiagnosticTimeline.renderRSSIChart("dhdRSSIChart",
+                statusData[C.Diagnostics.CELLULAR_RSSI]);
+        }, 50);
+    }
+
+    // ── Fault History ──────────────────────────────────────────────────
+
+    function renderFaultHistory(faults) {
+        var el = document.getElementById("dhdFaultHistory");
+        if (!el) { return; }
+
+        if (!faults || faults.length === 0) {
+            el.innerHTML = '<div class="dhd-empty-state">No faults recorded in the last 30 days.</div>';
+            return;
+        }
+
+        // Sort by date descending, take last 50
+        var sorted = faults.slice().sort(function (a, b) {
+            return new Date(b.dateTime) - new Date(a.dateTime);
+        }).slice(0, 50);
+
+        var html = '<table class="dhd-table dhd-table--faults">' +
+            '<thead><tr>' +
+            '<th>Date</th><th>Code</th><th>Description</th><th>Severity</th><th>State</th>' +
+            '</tr></thead><tbody>';
+
+        sorted.forEach(function (f) {
+            var dt = f.dateTime ? formatDate(f.dateTime) : "N/A";
+            var code = f.diagnostic ? (f.diagnostic.id || "—") : "—";
+            var desc = f.diagnostic ? (f.diagnostic.name || code) : "—";
+            var sev = classifyFaultSeverity(f);
+            var state = f.failureModeState === 1 ? "Active" : "Inactive";
+
+            html += '<tr>' +
+                '<td>' + dt + '</td>' +
+                '<td>' + escHtml(String(code)) + '</td>' +
+                '<td>' + escHtml(desc) + '</td>' +
+                '<td><span class="dhd-badge dhd-severity--' + sev + '">' + capitalize(sev) + '</span></td>' +
+                '<td>' + state + '</td>' +
+                '</tr>';
+        });
+
+        html += '</tbody></table>';
+        el.innerHTML = html;
+    }
+
+    // ── Device Info ────────────────────────────────────────────────────
+
+    function renderDeviceInfo(device, statusInfo) {
+        var el = document.getElementById("dhdDeviceInfo");
+        if (!el) { return; }
+
+        var fwPending = device.parameterVersion != null && device.parameterVersionOnDevice != null &&
+                        device.parameterVersion !== device.parameterVersionOnDevice;
+
+        var html = '<div class="dhd-info-grid">' +
+            infoItem("Serial Number", device.serialNumber || "N/A") +
+            infoItem("Product", device.productId ? "GO" + device.productId : "N/A") +
+            infoItem("Firmware", formatFirmware(device)) +
+            infoItem("Config Version", (device.parameterVersion || "N/A") +
+                (fwPending ? ' <span class="dhd-badge dhd-severity--info">Update Pending</span>' : "")) +
+            infoItem("On-Device Config", device.parameterVersionOnDevice || "N/A") +
+            infoItem("Communicating", statusInfo.isDeviceCommunicating ? "Yes" : "No") +
+            infoItem("Last Communication", statusInfo.dateTime ? formatDate(statusInfo.dateTime) : "N/A") +
+            infoItem("Position", statusInfo.latitude != null ?
+                statusInfo.latitude.toFixed(4) + ", " + statusInfo.longitude.toFixed(4) : "N/A") +
+            '</div>';
+
+        el.innerHTML = html;
+    }
+
+    // ── Utilities ──────────────────────────────────────────────────────
+
+    function infoItem(label, value) {
+        return '<div class="dhd-info-item"><span class="dhd-info-item__label">' +
+            escHtml(label) + '</span><span class="dhd-info-item__value">' + value + '</span></div>';
+    }
+
+    function classifyFaultSeverity(fault) {
+        if (!fault.diagnostic) { return C.Severity.INFO; }
+        var id = parseInt(fault.diagnostic.id, 10);
+        if (C.HARDWARE_FAULT_CODES.indexOf(id) !== -1) { return C.Severity.CRITICAL; }
+        if (id === 135 || id === 287) { return C.Severity.WARNING; }
+        return C.Severity.INFO;
+    }
+
+    function formatFirmware(device) {
+        if (device.majorVersion != null) {
+            return device.majorVersion + "." + (device.minorVersion || 0);
+        }
+        return "N/A";
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) { return "N/A"; }
+        var d = new Date(dateStr);
+        return (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear() + " " +
+            pad(d.getHours()) + ":" + pad(d.getMinutes());
+    }
+
+    function pad(n) { return n < 10 ? "0" + n : String(n); }
+
+    function escHtml(str) {
+        var div = document.createElement("div");
+        div.appendChild(document.createTextNode(str || ""));
+        return div.innerHTML;
+    }
+
+    function capitalize(s) {
+        return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
+    }
+
+    return {
+        render: render
+    };
+})();
+
+</script>
+    <script>
+/**
+ * main.js — MyGeotab add-in lifecycle host.
+ * Coordinates initialization, view switching, and data flow.
+ */
+var DHD = DHD || {};
+
+geotab.addin.deviceHealthDiagnostics = (function () {
+    "use strict";
+
+    var C = DHD.Constants;
+    var _api, _page;
+    var _fleetData = null;      // cached fleet health
+    var _classifications = [];  // classified fleet data
+    var _statusInfoMap = {};    // deviceId → statusInfo
+
+    // ── View toggling ──────────────────────────────────────────────────
+
+    function showFleetView() {
+        var fleet = document.getElementById("dhdFleetView");
+        var drill = document.getElementById("dhdDrillView");
+        if (fleet) { fleet.classList.add("dhd-view--active"); }
+        if (drill) { drill.classList.remove("dhd-view--active"); }
+    }
+
+    function showDrillView() {
+        var fleet = document.getElementById("dhdFleetView");
+        var drill = document.getElementById("dhdDrillView");
+        if (fleet) { fleet.classList.remove("dhd-view--active"); }
+        if (drill) { drill.classList.add("dhd-view--active"); }
+    }
+
+    // ── Loading / Error states ─────────────────────────────────────────
+
+    function showLoading(message) {
+        var el = document.getElementById("dhdLoading");
+        if (el) {
+            el.textContent = message || "Loading\u2026";
+            el.style.display = "flex";
+        }
+        var err = document.getElementById("dhdError");
+        if (err) { err.style.display = "none"; }
+    }
+
+    function hideLoading() {
+        var el = document.getElementById("dhdLoading");
+        if (el) { el.style.display = "none"; }
+    }
+
+    function showError(message) {
+        hideLoading();
+        var el = document.getElementById("dhdError");
+        if (el) {
+            el.textContent = message;
+            el.style.display = "block";
+        }
+    }
+
+    // ── Fleet data load & classify ─────────────────────────────────────
+
+    function loadFleetData() {
+        showLoading("Loading fleet health data\u2026");
+
+        DHD.DeviceCache.load(_api)
+            .then(function () {
+                return DHD.HealthService.fetchFleetHealth(_api);
+            })
+            .then(function (data) {
+                _fleetData = data;
+                classifyFleet();
+                hideLoading();
+                DHD.FleetDashboard.render(_classifications, onDeviceClick);
+            })
+            .catch(function (err) {
+                showError("Failed to load fleet data: " + (err.message || err));
+                console.error("DHD fleet load error:", err);
+            });
+    }
+
+    function classifyFleet() {
+        _classifications = [];
+        _statusInfoMap = {};
+
+        var devices = DHD.DeviceCache.getAllDevices();
+        var siMap = {};
+
+        // Index statusInfos by device id
+        _fleetData.statusInfos.forEach(function (si) {
+            if (si.device && si.device.id) {
+                siMap[si.device.id] = si;
+            }
+        });
+
+        devices.forEach(function (device) {
+            var si = siMap[device.id];
+            if (!si) { return; } // no status info — skip
+
+            _statusInfoMap[device.id] = si;
+
+            var faults = _fleetData.faultsByDevice[device.id] || [];
+            var classification = DHD.RootCauseEngine.classifyDevice(si, faults, device);
+
+            _classifications.push({
+                device: device,
+                statusInfo: si,
+                classification: classification
+            });
+        });
+    }
+
+    // ── Device drill-down ──────────────────────────────────────────────
+
+    function onDeviceClick(deviceId) {
+        var device = DHD.DeviceCache.getDevice(deviceId);
+        var statusInfo = _statusInfoMap[deviceId];
+        if (!device || !statusInfo) { return; }
+
+        showDrillView();
+        showLoading("Loading device diagnostics\u2026");
+
+        DHD.HealthService.fetchDeviceDrillDown(_api, deviceId)
+            .then(function (drillData) {
+                var analysis = DHD.RootCauseEngine.analyzeDevice(device, statusInfo, drillData);
+                hideLoading();
+                DHD.DeviceDiagnostics.render(device, statusInfo, analysis, drillData, function () {
+                    showFleetView();
+                });
+            })
+            .catch(function (err) {
+                showError("Failed to load device diagnostics: " + (err.message || err));
+                console.error("DHD drill-down error:", err);
+            });
+    }
+
+    // ── Refresh button ─────────────────────────────────────────────────
+
+    function bindRefresh() {
+        var btn = document.getElementById("dhdRefreshBtn");
+        if (btn) {
+            btn.addEventListener("click", function () {
+                showFleetView();
+                loadFleetData();
+            });
+        }
+    }
+
+    // ── Lifecycle ──────────────────────────────────────────────────────
+
+    return {
+        /**
+         * Called once when the add-in is first loaded.
+         */
+        initialize: function (api, page, callback) {
+            _api = api;
+            _page = page;
+
+            bindRefresh();
+            loadFleetData();
+
+            if (callback) { callback(); }
+        },
+
+        /**
+         * Called each time the user navigates to this add-in.
+         */
+        focus: function (api, page) {
+            _api = api;
+            _page = page;
+
+            var container = document.getElementById("dhdContainer");
+            if (container) { container.style.display = "block"; }
+
+            showFleetView();
+        },
+
+        /**
+         * Called when the user navigates away from this add-in.
+         */
+        blur: function () {
+            var container = document.getElementById("dhdContainer");
+            if (container) { container.style.display = "none"; }
+        }
+    };
+})();
+
+</script>
+</body>
+</html>

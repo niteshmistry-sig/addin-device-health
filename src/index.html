@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Health Diagnostics</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="dhdContainer" class="dhd-container">
+
+        <!-- Loading overlay -->
+        <div id="dhdLoading" class="dhd-loading" style="display:none;">
+            <div class="dhd-spinner"></div>
+            <span>Loading…</span>
+        </div>
+
+        <!-- Error banner -->
+        <div id="dhdError" class="dhd-error" style="display:none;"></div>
+
+        <!-- Header bar -->
+        <div class="dhd-header">
+            <h1 class="dhd-header__title">Device Health Diagnostics</h1>
+            <button id="dhdRefreshBtn" class="dhd-btn dhd-btn--refresh" title="Refresh">&#x21bb; Refresh</button>
+        </div>
+
+        <!-- ═══ Fleet Dashboard View ═══ -->
+        <div id="dhdFleetView" class="dhd-view dhd-view--active">
+
+            <!-- Summary tiles -->
+            <div id="dhdTiles" class="dhd-tiles"></div>
+
+            <!-- Search / filter bar -->
+            <div class="dhd-filter-bar">
+                <input type="text" id="dhdSearch" class="dhd-search" placeholder="Search by name or serial number…">
+            </div>
+
+            <!-- Device table -->
+            <div class="dhd-table-wrap">
+                <table class="dhd-table">
+                    <thead>
+                        <tr>
+                            <th class="dhd-table__th" data-sort="name">Name <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="serial">Serial # <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="severity">Severity <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="category">Issue <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="health">Health <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="lastComm">Last Comm <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dhdTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ═══ Device Drill-Down View ═══ -->
+        <div id="dhdDrillView" class="dhd-view">
+
+            <!-- Drill-down header (back btn + device name) -->
+            <div id="dhdDrillHeader" class="dhd-drill-header"></div>
+
+            <div class="dhd-drill-grid">
+
+                <!-- Health Score -->
+                <section class="dhd-card">
+                    <h3 class="dhd-card__title">Health Score</h3>
+                    <div id="dhdHealthScore"></div>
+                </section>
+
+                <!-- Active Issues -->
+                <section class="dhd-card">
+                    <h3 class="dhd-card__title">Active Issues</h3>
+                    <div id="dhdActiveIssues"></div>
+                </section>
+            </div>
+
+            <!-- Root Cause Analysis -->
+            <section class="dhd-card">
+                <h3 class="dhd-card__title">Root Cause Analysis</h3>
+                <div id="dhdRootCauses"></div>
+            </section>
+
+            <!-- Diagnostic Timeline Charts -->
+            <section class="dhd-card">
+                <h3 class="dhd-card__title">Diagnostic Timeline</h3>
+                <div class="dhd-charts-grid">
+                    <div class="dhd-chart-container">
+                        <h4 class="dhd-chart-title">Battery Voltage (30 days)</h4>
+                        <canvas id="dhdVoltageChart"></canvas>
+                    </div>
+                    <div class="dhd-chart-container">
+                        <h4 class="dhd-chart-title">Cellular RSSI (30 days)</h4>
+                        <canvas id="dhdRSSIChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Fault History -->
+            <section class="dhd-card">
+                <h3 class="dhd-card__title">Fault History (Last 30 Days)</h3>
+                <div id="dhdFaultHistory"></div>
+            </section>
+
+            <!-- Device Info -->
+            <section class="dhd-card">
+                <h3 class="dhd-card__title">Device Information</h3>
+                <div id="dhdDeviceInfo"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Scripts (order matters — constants first, main last) -->
+    <script src="js/constants.js"></script>
+    <script src="js/deviceCache.js"></script>
+    <script src="js/healthService.js"></script>
+    <script src="js/rootCauseEngine.js"></script>
+    <script src="js/diagnosticTimeline.js"></script>
+    <script src="js/fleetDashboard.js"></script>
+    <script src="js/deviceDiagnostics.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
