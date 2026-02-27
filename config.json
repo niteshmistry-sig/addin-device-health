@@ -1,15 +1,16 @@
 {
     "name": "Device Health Diagnostics",
-    "supportEmail": "support@geotab.com",
-    "version": "1.0.0",
+    "supportEmail": "support@example.com",
+    "version": "1.0",
     "items": [
         {
-            "url": "index.html",
+            "url": "https://niteshmistry-sig.github.io/addin-device-health/index.html",
             "path": "EngineMaintenanceLink/",
             "menuName": {
                 "en": "Device Health Diagnostics"
             },
-            "svgIcon": "images/icon.svg"
+            "svgIcon": "https://niteshmistry-sig.github.io/addin-device-health/images/icon.svg"
         }
-    ]
+    ],
+    "isSigned": false
 }
