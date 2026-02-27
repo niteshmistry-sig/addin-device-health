@@ -13,6 +13,7 @@ DHD.FleetDashboard = (function () {
     var _sortCol = "severity";
     var _sortAsc = true;
     var _onDeviceClick = null;
+    var _eventsBound = false;
 
     // ── Tile definitions ───────────────────────────────────────────────
 
@@ -123,13 +124,17 @@ DHD.FleetDashboard = (function () {
             }
         }
 
-        // Search text
+        // Search text — matches native MyGeotab: multi-field, multi-term
         if (_searchText) {
-            var q = _searchText.toLowerCase();
-            data = data.filter(function (item) {
-                return (item.device.name && item.device.name.toLowerCase().indexOf(q) !== -1) ||
-                       (item.device.serialNumber && item.device.serialNumber.toLowerCase().indexOf(q) !== -1);
-            });
+            var terms = _searchText.toLowerCase().trim().split(/\s+/).filter(function (t) { return t.length > 0; });
+            if (terms.length > 0) {
+                data = data.filter(function (item) {
+                    var searchable = buildSearchString(item);
+                    return terms.every(function (term) {
+                        return searchable.indexOf(term) !== -1;
+                    });
+                });
+            }
         }
 
         return data;
@@ -187,9 +192,47 @@ DHD.FleetDashboard = (function () {
         }
     }
 
+    // ── Search string builder (MyGeotab-style multi-field match) ──────
+
+    function buildSearchString(item) {
+        var device = item.device;
+        var cls = item.classification;
+        var parts = [
+            device.name || "",
+            device.serialNumber || "",
+            device.vehicleIdentificationNumber || "",
+            device.comment || "",
+            device.licensePlate || "",
+            device.productId ? "GO" + device.productId : "",
+            device.deviceType || ""
+        ];
+
+        // Groups — resolve names from cache
+        if (device.groups && device.groups.length > 0) {
+            device.groups.forEach(function (g) {
+                parts.push(DHD.DeviceCache.getGroupName(g.id));
+            });
+        }
+
+        // Issue category and severity (so users can type "critical", "gps", etc.)
+        parts.push(cls.severity || "");
+        parts.push(cls.primaryIssue || "");
+        if (cls.issues) {
+            cls.issues.forEach(function (issue) {
+                parts.push(issue.label || "");
+                parts.push(issue.category || "");
+            });
+        }
+
+        return parts.join(" ").toLowerCase();
+    }
+
     // ── Events ─────────────────────────────────────────────────────────
 
     function bindEvents() {
+        if (_eventsBound) { return; }
+        _eventsBound = true;
+
         // Tile clicks
         var tilesContainer = document.getElementById("dhdTiles");
         if (tilesContainer) {
