@@ -201,13 +201,17 @@
 /* ── Loading ────────────────────────────────────────────────────── */
 
 #dhdContainer .dhd-loading {
-    display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: var(--dhd-space-sm) !important;
     padding: var(--dhd-space-xl) 0 !important;
     color: var(--dhd-color-text-secondary) !important;
     font-size: 14px !important;
+}
+
+#dhdContainer .dhd-loading[style*="display: flex"],
+#dhdContainer .dhd-loading[style*="display:flex"] {
+    display: flex !important;
 }
 
 #dhdContainer .dhd-spinner {
