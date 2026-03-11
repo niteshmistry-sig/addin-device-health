@@ -27,12 +27,37 @@
         <!-- ═══ Fleet Dashboard View ═══ -->
         <div id="dhdFleetView" class="dhd-view dhd-view--active">
 
-            <!-- Summary tiles -->
-            <div id="dhdTiles" class="dhd-tiles"></div>
+            <!-- KPI Summary Cards -->
+            <div id="dhdKpiRow" class="dhd-kpi-row"></div>
 
-            <!-- Search / filter bar -->
-            <div class="dhd-filter-bar">
-                <input type="text" id="dhdSearch" class="dhd-search" placeholder="Search devices by name, serial, VIN, group, status…">
+            <!-- Insights Row: Donut + Top 5 + Bottom 5 -->
+            <div id="dhdInsightsRow" class="dhd-insights-row">
+                <div class="dhd-insight-card">
+                    <h3 class="dhd-insight-card__title">Health Distribution</h3>
+                    <div class="dhd-donut-container">
+                        <canvas id="dhdDonutChart" width="200" height="200"></canvas>
+                        <div id="dhdDonutCenter" class="dhd-donut-center"></div>
+                    </div>
+                    <div id="dhdDonutLegend" class="dhd-donut-legend"></div>
+                </div>
+                <div class="dhd-insight-card">
+                    <h3 class="dhd-insight-card__title">Top Issues</h3>
+                    <div id="dhdTopIssues" class="dhd-issue-list"></div>
+                </div>
+                <div class="dhd-insight-card">
+                    <h3 class="dhd-insight-card__title">Devices Needing Attention</h3>
+                    <div id="dhdNeedAttention" class="dhd-performer-list"></div>
+                </div>
+            </div>
+
+            <!-- Table Header: count + search + export -->
+            <div id="dhdTableHeader" class="dhd-table-header">
+                <span id="dhdTableCount" class="dhd-table-header__count">All Devices (0)</span>
+                <div class="dhd-table-header__actions">
+                    <input type="text" id="dhdSearch" class="dhd-search" placeholder="Search devices…">
+                    <button id="dhdCsvBtn" class="dhd-btn dhd-btn--small" title="Export CSV">&#x2B07; CSV</button>
+                    <button id="dhdPrintBtn" class="dhd-btn dhd-btn--small" title="Print">&#x1F5A8; Print</button>
+                </div>
             </div>
 
             <!-- Device table -->
@@ -41,12 +66,13 @@
                     <thead>
                         <tr>
                             <th class="dhd-table__th" data-sort="name">Name <span class="dhd-sort-icon"></span></th>
-                            <th class="dhd-table__th" data-sort="serial">Serial # <span class="dhd-sort-icon"></span></th>
-                            <th class="dhd-table__th" data-sort="severity">Severity <span class="dhd-sort-icon"></span></th>
-                            <th class="dhd-table__th" data-sort="category">Issue <span class="dhd-sort-icon"></span></th>
-                            <th class="dhd-table__th" data-sort="health">Health <span class="dhd-sort-icon"></span></th>
-                            <th class="dhd-table__th" data-sort="lastComm">Last Comm <span class="dhd-sort-icon"></span></th>
-                            <th class="dhd-table__th">Action</th>
+                            <th class="dhd-table__th" data-sort="score">Health <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="status">Status <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="power">Power <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="gps">GPS <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="cellular">Cellular <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="installation">Install <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="hardware">Hardware <span class="dhd-sort-icon"></span></th>
                         </tr>
                     </thead>
                     <tbody id="dhdTableBody"></tbody>

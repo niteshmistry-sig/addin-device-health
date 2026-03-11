@@ -6,7 +6,7 @@
     <title>Device Health Diagnostics</title>
     <style>
 /*
- * style.css — Device Health Diagnostics
+ * style.css — Device Health Diagnostics — Scorecard UI
  * All selectors scoped under #dhdContainer for MyGeotab CSS isolation.
  */
 
@@ -29,7 +29,7 @@
     --dhd-color-border: #e0e0e0;
     --dhd-color-bg: #f5f5f5;
     --dhd-color-surface: #ffffff;
-    --dhd-radius: 6px;
+    --dhd-radius: 8px;
     --dhd-radius-sm: 4px;
     --dhd-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
     --dhd-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -39,6 +39,16 @@
     --dhd-space-md: 16px;
     --dhd-space-lg: 24px;
     --dhd-space-xl: 32px;
+
+    /* Health status colors */
+    --dhd-status-healthy: #4caf50;
+    --dhd-status-healthy-bg: #e8f5e9;
+    --dhd-status-info: #0288d1;
+    --dhd-status-info-bg: #e1f5fe;
+    --dhd-status-warning: #ff9800;
+    --dhd-status-warning-bg: #fff3e0;
+    --dhd-status-critical: #f44336;
+    --dhd-status-critical-bg: #ffebee;
 }
 
 /* ── Reset & Base (scoped to #dhdContainer) ─────────────────────── */
@@ -232,71 +242,285 @@
     margin-bottom: var(--dhd-space-md) !important;
 }
 
-/* ── Summary Tiles ──────────────────────────────────────────────── */
+/* ── KPI Cards Row ─────────────────────────────────────────────── */
 
-#dhdContainer .dhd-tiles {
+#dhdContainer .dhd-kpi-row {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    grid-template-columns: repeat(4, 1fr) !important;
     gap: var(--dhd-space-md) !important;
     margin-bottom: var(--dhd-space-lg) !important;
 }
 
-#dhdContainer .dhd-tile {
+#dhdContainer .dhd-kpi-card {
     background: var(--dhd-color-surface) !important;
     border: 1px solid var(--dhd-color-border) !important;
     border-radius: var(--dhd-radius) !important;
-    padding: var(--dhd-space-md) !important;
+    padding: var(--dhd-space-lg) var(--dhd-space-md) !important;
     text-align: center !important;
-    cursor: pointer !important;
-    transition: box-shadow 0.15s, border-color 0.15s, transform 0.1s !important;
-    user-select: none !important;
+    box-shadow: var(--dhd-shadow) !important;
+    border-top: 4px solid var(--dhd-color-primary) !important;
+    transition: box-shadow 0.15s, transform 0.1s !important;
 }
 
-#dhdContainer .dhd-tile:hover {
-    box-shadow: var(--dhd-shadow) !important;
+#dhdContainer .dhd-kpi-card:hover {
+    box-shadow: var(--dhd-shadow-lg) !important;
     transform: translateY(-1px) !important;
 }
 
-#dhdContainer .dhd-tile--active {
-    border-color: var(--dhd-color-primary) !important;
-    box-shadow: 0 0 0 2px var(--dhd-color-primary-light) !important;
+#dhdContainer .dhd-kpi-card--success {
+    border-top-color: var(--dhd-color-success) !important;
 }
 
-#dhdContainer .dhd-tile--total {
-    border-left: 3px solid var(--dhd-color-primary) !important;
+#dhdContainer .dhd-kpi-card--warning {
+    border-top-color: var(--dhd-color-warning) !important;
 }
 
-#dhdContainer .dhd-tile--healthy {
-    border-left: 3px solid var(--dhd-color-success) !important;
+#dhdContainer .dhd-kpi-card--error {
+    border-top-color: var(--dhd-color-error) !important;
 }
 
-#dhdContainer .dhd-tile--issue {
-    border-left: 3px solid var(--dhd-color-error) !important;
-}
-
-#dhdContainer .dhd-tile__count {
-    font-size: 28px !important;
+#dhdContainer .dhd-kpi-card__value {
+    font-size: 36px !important;
     font-weight: 700 !important;
-    line-height: 1.2 !important;
+    line-height: 1.1 !important;
+    color: var(--dhd-color-text) !important;
+    margin-bottom: var(--dhd-space-xs) !important;
+}
+
+#dhdContainer .dhd-kpi-card__label {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.8px !important;
+    color: var(--dhd-color-text-secondary) !important;
+}
+
+/* ── Insights Row (3-column) ───────────────────────────────────── */
+
+#dhdContainer .dhd-insights-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1.5fr 1.5fr !important;
+    gap: var(--dhd-space-md) !important;
+    margin-bottom: var(--dhd-space-lg) !important;
+}
+
+#dhdContainer .dhd-insight-card {
+    background: var(--dhd-color-surface) !important;
+    border: 1px solid var(--dhd-color-border) !important;
+    border-radius: var(--dhd-radius) !important;
+    padding: var(--dhd-space-lg) !important;
+    box-shadow: var(--dhd-shadow) !important;
+}
+
+#dhdContainer .dhd-insight-card__title {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    margin: 0 0 var(--dhd-space-md) 0 !important;
     color: var(--dhd-color-text) !important;
 }
 
-#dhdContainer .dhd-tile__label {
-    font-size: 12px !important;
+/* ── Donut Chart ───────────────────────────────────────────────── */
+
+#dhdContainer .dhd-donut-container {
+    position: relative !important;
+    width: 180px !important;
+    height: 180px !important;
+    margin: 0 auto var(--dhd-space-md) !important;
+}
+
+#dhdContainer .dhd-donut-container canvas {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#dhdContainer .dhd-donut-center {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    text-align: center !important;
+    pointer-events: none !important;
+}
+
+#dhdContainer .dhd-donut-center__count {
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+    color: var(--dhd-color-text) !important;
+    display: block !important;
+}
+
+#dhdContainer .dhd-donut-center__label {
+    font-size: 11px !important;
     color: var(--dhd-color-text-secondary) !important;
-    margin-top: var(--dhd-space-xs) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
 }
 
-/* ── Filter Bar ─────────────────────────────────────────────────── */
+#dhdContainer .dhd-donut-legend {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: var(--dhd-space-sm) var(--dhd-space-md) !important;
+}
 
-#dhdContainer .dhd-filter-bar {
+#dhdContainer .dhd-donut-legend__item {
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--dhd-space-xs) !important;
+    font-size: 11px !important;
+    color: var(--dhd-color-text-secondary) !important;
+}
+
+#dhdContainer .dhd-donut-legend__dot {
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+}
+
+/* ── Issue List (Top Issues) ────────────────────────────────────── */
+
+#dhdContainer .dhd-issue-list {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+#dhdContainer .dhd-issue-item {
+    display: flex !important;
+    align-items: center !important;
+    padding: var(--dhd-space-sm) 0 !important;
+    border-bottom: 1px solid var(--dhd-color-border) !important;
+    gap: var(--dhd-space-sm) !important;
+}
+
+#dhdContainer .dhd-issue-item:last-child {
+    border-bottom: none !important;
+}
+
+#dhdContainer .dhd-issue-item__indicator {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+}
+
+#dhdContainer .dhd-issue-item__label {
+    flex: 1 !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: var(--dhd-color-text) !important;
+}
+
+#dhdContainer .dhd-issue-item__count {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: var(--dhd-color-text) !important;
+    min-width: 24px !important;
+    text-align: right !important;
+}
+
+#dhdContainer .dhd-issue-item__suffix {
+    font-size: 11px !important;
+    color: var(--dhd-color-text-hint) !important;
+}
+
+#dhdContainer .dhd-issue-item__bar-wrap {
+    width: 60px !important;
+    height: 6px !important;
+    background: var(--dhd-color-bg) !important;
+    border-radius: 3px !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+}
+
+#dhdContainer .dhd-issue-item__bar {
+    height: 100% !important;
+    border-radius: 3px !important;
+}
+
+/* ── Attention / Performer Lists ───────────────────────────────── */
+
+#dhdContainer .dhd-performer-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+#dhdContainer .dhd-performer-item {
+    display: flex !important;
+    align-items: center !important;
+    padding: var(--dhd-space-sm) 0 !important;
+    border-bottom: 1px solid var(--dhd-color-border) !important;
+    cursor: pointer !important;
+}
+
+#dhdContainer .dhd-performer-item:last-child {
+    border-bottom: none !important;
+}
+
+#dhdContainer .dhd-performer-item:hover {
+    background: var(--dhd-color-primary-light) !important;
+    margin: 0 calc(-1 * var(--dhd-space-lg)) !important;
+    padding-left: var(--dhd-space-lg) !important;
+    padding-right: var(--dhd-space-lg) !important;
+}
+
+#dhdContainer .dhd-performer-rank {
+    width: 24px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: var(--dhd-color-text-hint) !important;
+    flex-shrink: 0 !important;
+}
+
+#dhdContainer .dhd-performer-name {
+    flex: 1 !important;
+    font-size: 13px !important;
+    color: var(--dhd-color-primary) !important;
+    font-weight: 500 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+#dhdContainer .dhd-performer-score {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    min-width: 32px !important;
+    text-align: right !important;
+    flex-shrink: 0 !important;
+}
+
+/* ── Table Header Bar ──────────────────────────────────────────── */
+
+#dhdContainer .dhd-table-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
     margin-bottom: var(--dhd-space-md) !important;
+    flex-wrap: wrap !important;
+    gap: var(--dhd-space-sm) !important;
 }
+
+#dhdContainer .dhd-table-header__count {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: var(--dhd-color-text) !important;
+}
+
+#dhdContainer .dhd-table-header__actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--dhd-space-sm) !important;
+}
+
+/* ── Filter Bar / Search ───────────────────────────────────────── */
 
 #dhdContainer .dhd-search {
-    width: 100% !important;
-    max-width: 400px !important;
-    padding: var(--dhd-space-sm) var(--dhd-space-md) !important;
+    width: 220px !important;
+    padding: var(--dhd-space-xs) var(--dhd-space-sm) !important;
     font-family: var(--dhd-font) !important;
     font-size: 13px !important;
     border: 1px solid var(--dhd-color-border) !important;
@@ -331,7 +555,7 @@
 #dhdContainer .dhd-table__th {
     text-align: left !important;
     padding: var(--dhd-space-sm) var(--dhd-space-md) !important;
-    font-size: 12px !important;
+    font-size: 11px !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
@@ -396,11 +620,11 @@
     font-style: italic !important;
 }
 
-/* ── Badges / Severity ──────────────────────────────────────────── */
+/* ── Status Badges ──────────────────────────────────────────────── */
 
 #dhdContainer .dhd-badge {
     display: inline-block !important;
-    padding: 2px 8px !important;
+    padding: 2px 10px !important;
     border-radius: 12px !important;
     font-size: 11px !important;
     font-weight: 600 !important;
@@ -411,6 +635,27 @@
     box-shadow: none !important;
 }
 
+#dhdContainer .dhd-status-badge--healthy {
+    background: var(--dhd-status-healthy-bg) !important;
+    color: var(--dhd-status-healthy) !important;
+}
+
+#dhdContainer .dhd-status-badge--info {
+    background: var(--dhd-status-info-bg) !important;
+    color: var(--dhd-status-info) !important;
+}
+
+#dhdContainer .dhd-status-badge--warning {
+    background: var(--dhd-status-warning-bg) !important;
+    color: var(--dhd-status-warning) !important;
+}
+
+#dhdContainer .dhd-status-badge--critical {
+    background: var(--dhd-status-critical-bg) !important;
+    color: var(--dhd-status-critical) !important;
+}
+
+/* Keep old severity badges for drill-down view */
 #dhdContainer .dhd-severity--critical {
     background: var(--dhd-color-error-light) !important;
     color: var(--dhd-color-error) !important;
@@ -431,7 +676,38 @@
     color: var(--dhd-color-success) !important;
 }
 
-/* ── Health Score Bar (table) ───────────────────────────────────── */
+/* ── Score Bar (inline in table cells) ─────────────────────────── */
+
+#dhdContainer .dhd-score-bar {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    min-width: 100px !important;
+}
+
+#dhdContainer .dhd-score-bar__track {
+    flex: 1 !important;
+    height: 8px !important;
+    background: var(--dhd-color-bg) !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+    min-width: 40px !important;
+}
+
+#dhdContainer .dhd-score-bar__fill {
+    height: 100% !important;
+    border-radius: 4px !important;
+    transition: width 0.3s !important;
+}
+
+#dhdContainer .dhd-score-bar__text {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    color: var(--dhd-color-text-secondary) !important;
+}
+
+/* ── Health Score Bar (drill-down — legacy) ─────────────────────── */
 
 #dhdContainer .dhd-health-bar {
     display: flex !important;
@@ -689,9 +965,44 @@
     font-style: italic !important;
 }
 
+/* ── Print Styles ──────────────────────────────────────────────── */
+
+@media print {
+    body > *:not(#dhdContainer) {
+        display: none !important;
+    }
+    #dhdContainer {
+        padding: 0 !important;
+        background: white !important;
+    }
+    #dhdContainer .dhd-header,
+    #dhdContainer .dhd-btn,
+    #dhdContainer .dhd-search,
+    #dhdContainer #dhdDrillView {
+        display: none !important;
+    }
+    #dhdContainer .dhd-kpi-card,
+    #dhdContainer .dhd-insight-card {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+    }
+    #dhdContainer .dhd-table {
+        box-shadow: none !important;
+    }
+}
+
 /* ── Responsive ─────────────────────────────────────────────────── */
 
+@media (max-width: 1100px) {
+    #dhdContainer .dhd-insights-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
 @media (max-width: 900px) {
+    #dhdContainer .dhd-kpi-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
     #dhdContainer .dhd-drill-grid {
         grid-template-columns: 1fr !important;
     }
@@ -707,13 +1018,20 @@
     #dhdContainer {
         padding: var(--dhd-space-md) !important;
     }
-    #dhdContainer .dhd-tiles {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+    #dhdContainer .dhd-kpi-row {
+        grid-template-columns: 1fr 1fr !important;
     }
     #dhdContainer .dhd-header {
         flex-direction: column !important;
         align-items: flex-start !important;
         gap: var(--dhd-space-sm) !important;
+    }
+    #dhdContainer .dhd-table-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+    #dhdContainer .dhd-search {
+        width: 100% !important;
     }
 }
 
@@ -740,12 +1058,37 @@
         <!-- ═══ Fleet Dashboard View ═══ -->
         <div id="dhdFleetView" class="dhd-view dhd-view--active">
 
-            <!-- Summary tiles -->
-            <div id="dhdTiles" class="dhd-tiles"></div>
+            <!-- KPI Summary Cards -->
+            <div id="dhdKpiRow" class="dhd-kpi-row"></div>
 
-            <!-- Search / filter bar -->
-            <div class="dhd-filter-bar">
-                <input type="text" id="dhdSearch" class="dhd-search" placeholder="Search devices by name, serial, VIN, group, status…">
+            <!-- Insights Row: Donut + Top 5 + Bottom 5 -->
+            <div id="dhdInsightsRow" class="dhd-insights-row">
+                <div class="dhd-insight-card">
+                    <h3 class="dhd-insight-card__title">Health Distribution</h3>
+                    <div class="dhd-donut-container">
+                        <canvas id="dhdDonutChart" width="200" height="200"></canvas>
+                        <div id="dhdDonutCenter" class="dhd-donut-center"></div>
+                    </div>
+                    <div id="dhdDonutLegend" class="dhd-donut-legend"></div>
+                </div>
+                <div class="dhd-insight-card">
+                    <h3 class="dhd-insight-card__title">Top Issues</h3>
+                    <div id="dhdTopIssues" class="dhd-issue-list"></div>
+                </div>
+                <div class="dhd-insight-card">
+                    <h3 class="dhd-insight-card__title">Devices Needing Attention</h3>
+                    <div id="dhdNeedAttention" class="dhd-performer-list"></div>
+                </div>
+            </div>
+
+            <!-- Table Header: count + search + export -->
+            <div id="dhdTableHeader" class="dhd-table-header">
+                <span id="dhdTableCount" class="dhd-table-header__count">All Devices (0)</span>
+                <div class="dhd-table-header__actions">
+                    <input type="text" id="dhdSearch" class="dhd-search" placeholder="Search devices…">
+                    <button id="dhdCsvBtn" class="dhd-btn dhd-btn--small" title="Export CSV">&#x2B07; CSV</button>
+                    <button id="dhdPrintBtn" class="dhd-btn dhd-btn--small" title="Print">&#x1F5A8; Print</button>
+                </div>
             </div>
 
             <!-- Device table -->
@@ -754,12 +1097,13 @@
                     <thead>
                         <tr>
                             <th class="dhd-table__th" data-sort="name">Name <span class="dhd-sort-icon"></span></th>
-                            <th class="dhd-table__th" data-sort="serial">Serial # <span class="dhd-sort-icon"></span></th>
-                            <th class="dhd-table__th" data-sort="severity">Severity <span class="dhd-sort-icon"></span></th>
-                            <th class="dhd-table__th" data-sort="category">Issue <span class="dhd-sort-icon"></span></th>
-                            <th class="dhd-table__th" data-sort="health">Health <span class="dhd-sort-icon"></span></th>
-                            <th class="dhd-table__th" data-sort="lastComm">Last Comm <span class="dhd-sort-icon"></span></th>
-                            <th class="dhd-table__th">Action</th>
+                            <th class="dhd-table__th" data-sort="score">Health <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="status">Status <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="power">Power <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="gps">GPS <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="cellular">Cellular <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="installation">Install <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="hardware">Hardware <span class="dhd-sort-icon"></span></th>
                         </tr>
                     </thead>
                     <tbody id="dhdTableBody"></tbody>
@@ -1927,7 +2271,8 @@ DHD.DiagnosticTimeline = (function () {
 </script>
     <script>
 /**
- * fleetDashboard.js — Summary tiles + sortable/filterable device table.
+ * fleetDashboard.js — Scorecard-style fleet dashboard with KPI cards,
+ * health distribution donut, top/bottom devices, and per-category score table.
  */
 var DHD = DHD || {};
 
@@ -1935,69 +2280,298 @@ DHD.FleetDashboard = (function () {
     "use strict";
 
     var C = DHD.Constants;
-    var _classifications = [];  // cached fleet results
-    var _activeFilter = null;   // tile filter
+    var _classifications = [];
     var _searchText = "";
-    var _sortCol = "severity";
-    var _sortAsc = true;
+    var _sortCol = "score";
+    var _sortAsc = false;
     var _onDeviceClick = null;
     var _eventsBound = false;
 
-    // ── Tile definitions ───────────────────────────────────────────────
+    // ── Health status levels (maps to severity system) ──────────────
 
-    var TILES = [
-        { key: "total",     label: "Total",            icon: "devices",     filterFn: function () { return true; } },
-        { key: "healthy",   label: "Healthy",          icon: "check",       filterFn: function (c) { return c.severity === C.Severity.HEALTHY; } },
-        { key: "offline",   label: "Offline",          icon: "cloud_off",   filterFn: function (c) { return c.issues.some(function (i) { return i.category === C.Category.OFFLINE; }); } },
-        { key: "battery",   label: "Low Battery",      icon: "battery_alert", filterFn: function (c) { return c.primaryIssue === C.Category.POWER; } },
-        { key: "install",   label: "Loose Install",    icon: "build",       filterFn: function (c) { return c.primaryIssue === C.Category.INSTALLATION; } },
-        { key: "gps",       label: "GPS Issues",       icon: "gps_off",     filterFn: function (c) { return c.primaryIssue === C.Category.GPS; } },
-        { key: "hardware",  label: "Hardware Failure",  icon: "error",       filterFn: function (c) { return c.primaryIssue === C.Category.HARDWARE; } },
-        { key: "unplugged", label: "Unplugged",         icon: "power_off",   filterFn: function (c) { return c.primaryIssue === C.Category.UNPLUGGED; } }
+    var HEALTH_LEVELS = [
+        { key: "healthy",  label: "Healthy",  severity: C.Severity.HEALTHY,  color: "#4caf50", bg: "#e8f5e9" },
+        { key: "info",     label: "Info",     severity: C.Severity.INFO,     color: "#0288d1", bg: "#e1f5fe" },
+        { key: "warning",  label: "Warning",  severity: C.Severity.WARNING,  color: "#ff9800", bg: "#fff3e0" },
+        { key: "critical", label: "Critical", severity: C.Severity.CRITICAL, color: "#f44336", bg: "#ffebee" }
     ];
 
-    /**
-     * Render the fleet dashboard with the given classified data.
-     * @param {Object[]} classifications - Array of { device, statusInfo, classification }
-     * @param {Function} onDeviceClick - callback(deviceId)
-     */
+    // Issue categories shown as table columns
+    var CATEGORY_COLS = [
+        { key: "power",        label: "Power",    categories: [C.Category.POWER] },
+        { key: "gps",          label: "GPS",      categories: [C.Category.GPS] },
+        { key: "cellular",     label: "Cellular", categories: [C.Category.CELLULAR, C.Category.OFFLINE] },
+        { key: "installation", label: "Install",  categories: [C.Category.INSTALLATION] },
+        { key: "hardware",     label: "Hardware", categories: [C.Category.HARDWARE, C.Category.UNPLUGGED] }
+    ];
+
+    function getHealthLevel(severity) {
+        for (var i = 0; i < HEALTH_LEVELS.length; i++) {
+            if (HEALTH_LEVELS[i].severity === severity) {
+                return HEALTH_LEVELS[i];
+            }
+        }
+        return HEALTH_LEVELS[0]; // default healthy
+    }
+
+    function getScoreColor(score) {
+        if (score >= 80) { return "#4caf50"; }
+        if (score >= 60) { return "#ff9800"; }
+        if (score >= 40) { return "#f57c00"; }
+        return "#f44336";
+    }
+
+    // ── Entry point ─────────────────────────────────────────────────
+
     function render(classifications, onDeviceClick) {
         _classifications = classifications;
         _onDeviceClick = onDeviceClick;
-        _activeFilter = null;
         _searchText = "";
 
-        renderTiles();
+        var metrics = computeFleetMetrics();
+        renderKPICards(metrics);
+        renderHealthDistribution(metrics);
+        renderTopIssues();
+        renderNeedAttention();
+        renderTableHeader();
         renderTable();
         bindEvents();
     }
 
-    // ── Tiles ──────────────────────────────────────────────────────────
+    // ── Compute fleet metrics ───────────────────────────────────────
 
-    function renderTiles() {
-        var container = document.getElementById("dhdTiles");
+    function computeFleetMetrics() {
+        var total = _classifications.length;
+        var totalScore = 0;
+        var healthyCount = 0;
+        var issueCount = 0;
+        var offlineCount = 0;
+        var statusCounts = { healthy: 0, info: 0, warning: 0, critical: 0 };
+
+        _classifications.forEach(function (item) {
+            var cls = item.classification;
+            totalScore += cls.healthScore;
+
+            // Count by severity
+            var level = getHealthLevel(cls.severity);
+            statusCounts[level.key]++;
+
+            if (cls.severity === C.Severity.HEALTHY) {
+                healthyCount++;
+            } else {
+                issueCount++;
+            }
+
+            // Count offline devices
+            if (cls.issues.some(function (issue) { return issue.category === C.Category.OFFLINE; })) {
+                offlineCount++;
+            }
+        });
+
+        return {
+            fleetScore: total > 0 ? (totalScore / total) : 0,
+            totalDevices: total,
+            healthyCount: healthyCount,
+            issueCount: issueCount,
+            offlineCount: offlineCount,
+            statusCounts: statusCounts
+        };
+    }
+
+    // ── KPI Cards ───────────────────────────────────────────────────
+
+    function renderKPICards(metrics) {
+        var container = document.getElementById("dhdKpiRow");
         if (!container) { return; }
 
+        var cards = [
+            { value: metrics.fleetScore.toFixed(1), label: "Fleet Health", accent: "dhd-kpi-card--success" },
+            { value: formatNum(metrics.totalDevices), label: "Total Devices", accent: "" },
+            { value: formatNum(metrics.healthyCount), label: "Healthy", accent: "dhd-kpi-card--success" },
+            { value: formatNum(metrics.issueCount), label: "Issues Detected", accent: metrics.issueCount > 0 ? "dhd-kpi-card--error" : "" }
+        ];
+
         var html = "";
-        TILES.forEach(function (tile) {
-            var count = _classifications.filter(tile.filterFn).length;
-            var colorClass = "dhd-tile";
-            if (tile.key === "healthy") { colorClass += " dhd-tile--healthy"; }
-            else if (tile.key === "total") { colorClass += " dhd-tile--total"; }
-            else if (count > 0) { colorClass += " dhd-tile--issue"; }
-
-            var activeClass = (_activeFilter === tile.key) ? " dhd-tile--active" : "";
-
-            html += '<div class="' + colorClass + activeClass + '" data-tile="' + tile.key + '">' +
-                '<div class="dhd-tile__count">' + count + '</div>' +
-                '<div class="dhd-tile__label">' + tile.label + '</div>' +
+        cards.forEach(function (c) {
+            html += '<div class="dhd-kpi-card ' + c.accent + '">' +
+                '<div class="dhd-kpi-card__value">' + c.value + '</div>' +
+                '<div class="dhd-kpi-card__label">' + c.label + '</div>' +
                 '</div>';
         });
 
         container.innerHTML = html;
     }
 
-    // ── Table ──────────────────────────────────────────────────────────
+    // ── Donut Chart ─────────────────────────────────────────────────
+
+    function renderHealthDistribution(metrics) {
+        var canvas = document.getElementById("dhdDonutChart");
+        var centerEl = document.getElementById("dhdDonutCenter");
+        var legendEl = document.getElementById("dhdDonutLegend");
+        if (!canvas || !canvas.getContext) { return; }
+
+        var ctx = canvas.getContext("2d");
+        var dpr = window.devicePixelRatio || 1;
+        var size = 180;
+        canvas.width = size * dpr;
+        canvas.height = size * dpr;
+        canvas.style.width = size + "px";
+        canvas.style.height = size + "px";
+        ctx.scale(dpr, dpr);
+
+        var cx = size / 2;
+        var cy = size / 2;
+        var outerR = 80;
+        var innerR = 55;
+        var total = metrics.totalDevices || 1;
+
+        var segments = [];
+        HEALTH_LEVELS.forEach(function (level) {
+            var count = metrics.statusCounts[level.key] || 0;
+            if (count > 0) {
+                segments.push({ label: level.label, count: count, color: level.color });
+            }
+        });
+
+        if (segments.length === 0) {
+            segments.push({ label: "No Data", count: 1, color: "#e0e0e0" });
+        }
+
+        // Draw arcs
+        var startAngle = -Math.PI / 2;
+        segments.forEach(function (seg) {
+            var sweep = (seg.count / total) * 2 * Math.PI;
+            var endAngle = startAngle + sweep;
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, outerR, startAngle, endAngle);
+            ctx.arc(cx, cy, innerR, endAngle, startAngle, true);
+            ctx.closePath();
+            ctx.fillStyle = seg.color;
+            ctx.fill();
+
+            startAngle = endAngle;
+        });
+
+        // Center text
+        if (centerEl) {
+            centerEl.innerHTML = '<span class="dhd-donut-center__count">' + formatNum(metrics.totalDevices) + '</span>' +
+                '<span class="dhd-donut-center__label">Devices</span>';
+        }
+
+        // Legend
+        if (legendEl) {
+            var lhtml = "";
+            HEALTH_LEVELS.forEach(function (level) {
+                var count = metrics.statusCounts[level.key] || 0;
+                lhtml += '<span class="dhd-donut-legend__item">' +
+                    '<span class="dhd-donut-legend__dot" style="background:' + level.color + '"></span>' +
+                    level.label + ' (' + count + ')' +
+                    '</span>';
+            });
+            legendEl.innerHTML = lhtml;
+        }
+    }
+
+    // ── Top Issues ──────────────────────────────────────────────────
+
+    function renderTopIssues() {
+        var container = document.getElementById("dhdTopIssues");
+        if (!container) { return; }
+
+        // Aggregate issues by label across all devices
+        var issueCounts = {};
+        var issueSeverity = {};
+        _classifications.forEach(function (item) {
+            item.classification.issues.forEach(function (issue) {
+                var lbl = issue.label || "Unknown";
+                issueCounts[lbl] = (issueCounts[lbl] || 0) + 1;
+                // Keep the worst severity seen for this issue type
+                if (!issueSeverity[lbl] || severityRank(issue.severity) < severityRank(issueSeverity[lbl])) {
+                    issueSeverity[lbl] = issue.severity;
+                }
+            });
+        });
+
+        // Sort by count descending, take top 5
+        var sorted = Object.keys(issueCounts).map(function (lbl) {
+            return { label: lbl, count: issueCounts[lbl], severity: issueSeverity[lbl] };
+        }).sort(function (a, b) {
+            return b.count - a.count;
+        }).slice(0, 5);
+
+        if (sorted.length === 0) {
+            container.innerHTML = '<div class="dhd-empty-state">No issues detected</div>';
+            return;
+        }
+
+        var maxCount = sorted[0].count;
+        var severityColors = {};
+        severityColors[C.Severity.CRITICAL] = "#f44336";
+        severityColors[C.Severity.WARNING] = "#ff9800";
+        severityColors[C.Severity.INFO] = "#0288d1";
+        severityColors[C.Severity.HEALTHY] = "#4caf50";
+
+        var html = "";
+        sorted.forEach(function (item) {
+            var color = severityColors[item.severity] || "#9e9e9e";
+            var barPct = Math.round((item.count / maxCount) * 100);
+            html += '<div class="dhd-issue-item">' +
+                '<span class="dhd-issue-item__indicator" style="background:' + color + '"></span>' +
+                '<span class="dhd-issue-item__label">' + escHtml(item.label) + '</span>' +
+                '<span class="dhd-issue-item__count">' + item.count + '</span>' +
+                '<span class="dhd-issue-item__suffix">devices</span>' +
+                '<div class="dhd-issue-item__bar-wrap"><div class="dhd-issue-item__bar" style="width:' + barPct + '%;background:' + color + '"></div></div>' +
+                '</div>';
+        });
+
+        container.innerHTML = html;
+    }
+
+    // ── Devices Needing Attention ────────────────────────────────────
+
+    function renderNeedAttention() {
+        var container = document.getElementById("dhdNeedAttention");
+        if (!container) { return; }
+
+        // Filter to devices that have issues, sort by health score ascending
+        var withIssues = _classifications.filter(function (item) {
+            return item.classification.severity !== C.Severity.HEALTHY;
+        }).sort(function (a, b) {
+            return a.classification.healthScore - b.classification.healthScore;
+        }).slice(0, 5);
+
+        if (withIssues.length === 0) {
+            container.innerHTML = '<div class="dhd-empty-state">All devices healthy</div>';
+            return;
+        }
+
+        var html = "";
+        withIssues.forEach(function (item, i) {
+            var score = item.classification.healthScore;
+            var color = getScoreColor(score);
+            var issueLabel = item.classification.issues.length > 0 ? item.classification.issues[0].label : "";
+            html += '<div class="dhd-performer-item" data-device-id="' + item.device.id + '">' +
+                '<span class="dhd-performer-rank">' + (i + 1) + '.</span>' +
+                '<span class="dhd-performer-name">' + escHtml(item.device.name) + '</span>' +
+                '<span class="dhd-performer-score" style="color:' + color + '">' + score + '</span>' +
+                '</div>';
+        });
+
+        container.innerHTML = html;
+    }
+
+    // ── Table Header ────────────────────────────────────────────────
+
+    function renderTableHeader() {
+        var countEl = document.getElementById("dhdTableCount");
+        if (countEl) {
+            var filtered = getFilteredData();
+            countEl.textContent = "All Devices (" + filtered.length + ")";
+        }
+    }
+
+    // ── Table ───────────────────────────────────────────────────────
 
     function renderTable() {
         var tbody = document.getElementById("dhdTableBody");
@@ -2006,8 +2580,14 @@ DHD.FleetDashboard = (function () {
         var filtered = getFilteredData();
         filtered = sortData(filtered);
 
+        // Update count
+        var countEl = document.getElementById("dhdTableCount");
+        if (countEl) {
+            countEl.textContent = "All Devices (" + filtered.length + ")";
+        }
+
         if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="dhd-empty">No devices match the current filters.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="dhd-empty">No devices match the current filters.</td></tr>';
             return;
         }
 
@@ -2015,44 +2595,68 @@ DHD.FleetDashboard = (function () {
         filtered.forEach(function (item) {
             var cls = item.classification;
             var device = item.device;
-            var si = item.statusInfo;
-            var sevClass = "dhd-severity--" + cls.severity;
-            var barWidth = cls.healthScore + "%";
-            var barClass = "dhd-health-bar__fill";
-            if (cls.healthScore < 40) { barClass += " dhd-health-bar__fill--critical"; }
-            else if (cls.healthScore < 70) { barClass += " dhd-health-bar__fill--warning"; }
+            var score = cls.healthScore;
+            var level = getHealthLevel(cls.severity);
 
-            var lastComm = si.dateTime ? formatDate(si.dateTime) : "N/A";
-            var issueLbl = cls.primaryIssue === C.Category.HEALTHY ? "Healthy" : (cls.issues.length > 0 ? cls.issues[0].label : "Unknown");
+            // Compute per-category scores
+            var catScores = computeCategoryScores(cls);
 
-            html += '<tr class="dhd-table__row" data-device-id="' + device.id + '">' +
-                '<td class="dhd-table__cell">' + escHtml(device.name) + '</td>' +
-                '<td class="dhd-table__cell">' + escHtml(device.serialNumber || "—") + '</td>' +
-                '<td class="dhd-table__cell"><span class="dhd-badge ' + sevClass + '">' + capitalize(cls.severity) + '</span></td>' +
-                '<td class="dhd-table__cell">' + escHtml(issueLbl) + '</td>' +
-                '<td class="dhd-table__cell"><div class="dhd-health-bar"><div class="' + barClass + '" style="width:' + barWidth + '"></div><span class="dhd-health-bar__text">' + cls.healthScore + '</span></div></td>' +
-                '<td class="dhd-table__cell">' + lastComm + '</td>' +
-                '<td class="dhd-table__cell"><button class="dhd-btn dhd-btn--small dhd-btn--diagnose" data-device-id="' + device.id + '">Diagnose</button></td>' +
-                '</tr>';
+            html += '<tr class="dhd-table__row" data-device-id="' + device.id + '">';
+
+            // Name
+            html += '<td class="dhd-table__cell">' + escHtml(device.name) + '</td>';
+
+            // Health Score
+            html += '<td class="dhd-table__cell">' + renderScoreBar(score) + '</td>';
+
+            // Status badge
+            html += '<td class="dhd-table__cell"><span class="dhd-badge dhd-status-badge--' + level.key + '">' + level.label + '</span></td>';
+
+            // Category columns
+            CATEGORY_COLS.forEach(function (col) {
+                var cs = catScores[col.key];
+                html += '<td class="dhd-table__cell">' + renderScoreBar(cs.score, cs.count) + '</td>';
+            });
+
+            html += '</tr>';
         });
 
         tbody.innerHTML = html;
     }
 
+    function computeCategoryScores(classification) {
+        var scores = {};
+        CATEGORY_COLS.forEach(function (col) {
+            var count = 0;
+            var deduction = 0;
+            classification.issues.forEach(function (issue) {
+                if (col.categories.indexOf(issue.category) !== -1) {
+                    count++;
+                    deduction += (C.ScoreDeductions[issue.severity] || 0);
+                }
+            });
+            scores[col.key] = {
+                score: Math.max(0, 100 - deduction),
+                count: count
+            };
+        });
+        return scores;
+    }
+
+    function renderScoreBar(score, eventCount) {
+        var color = getScoreColor(score);
+        var countStr = typeof eventCount === "number" ? ' <span style="color:#9e9e9e">(' + eventCount + ')</span>' : '';
+        return '<div class="dhd-score-bar">' +
+            '<div class="dhd-score-bar__track"><div class="dhd-score-bar__fill" style="width:' + score + '%;background:' + color + '"></div></div>' +
+            '<span class="dhd-score-bar__text" style="color:' + color + '">' + score + countStr + '</span>' +
+            '</div>';
+    }
+
+    // ── Filtering ───────────────────────────────────────────────────
+
     function getFilteredData() {
         var data = _classifications;
 
-        // Tile filter
-        if (_activeFilter && _activeFilter !== "total") {
-            var tile = TILES.find(function (t) { return t.key === _activeFilter; });
-            if (tile) {
-                data = data.filter(function (item) {
-                    return tile.filterFn(item.classification);
-                });
-            }
-        }
-
-        // Search text — matches native MyGeotab: multi-field, multi-term
         if (_searchText) {
             var terms = _searchText.toLowerCase().trim().split(/\s+/).filter(function (t) { return t.length > 0; });
             if (terms.length > 0) {
@@ -2068,6 +2672,51 @@ DHD.FleetDashboard = (function () {
         return data;
     }
 
+    function buildSearchString(item) {
+        var device = item.device;
+        var cls = item.classification;
+        var level = getHealthLevel(cls.severity);
+        var parts = [
+            device.name || "",
+            device.serialNumber || "",
+            device.vehicleIdentificationNumber || "",
+            device.comment || "",
+            device.licensePlate || "",
+            device.productId ? "GO" + device.productId : "",
+            device.deviceType || "",
+            level.label || "",
+            cls.severity || "",
+            cls.primaryIssue || ""
+        ];
+
+        if (device.groups && device.groups.length > 0) {
+            device.groups.forEach(function (g) {
+                parts.push(DHD.DeviceCache.getGroupName(g.id));
+            });
+        }
+
+        if (cls.issues) {
+            cls.issues.forEach(function (issue) {
+                parts.push(issue.label || "");
+                parts.push(issue.category || "");
+            });
+        }
+
+        return parts.join(" ").toLowerCase();
+    }
+
+    // ── Sorting ─────────────────────────────────────────────────────
+
+    function severityRank(s) {
+        switch (s) {
+            case C.Severity.CRITICAL: return 0;
+            case C.Severity.WARNING: return 1;
+            case C.Severity.INFO: return 2;
+            case C.Severity.HEALTHY: return 3;
+            default: return 4;
+        }
+    }
+
     function sortData(data) {
         var col = _sortCol;
         var asc = _sortAsc;
@@ -2079,25 +2728,23 @@ DHD.FleetDashboard = (function () {
                     va = (a.device.name || "").toLowerCase();
                     vb = (b.device.name || "").toLowerCase();
                     break;
-                case "serial":
-                    va = (a.device.serialNumber || "").toLowerCase();
-                    vb = (b.device.serialNumber || "").toLowerCase();
-                    break;
-                case "severity":
-                    va = severityRank(a.classification.severity);
-                    vb = severityRank(b.classification.severity);
-                    break;
-                case "category":
-                    va = a.classification.primaryIssue;
-                    vb = b.classification.primaryIssue;
-                    break;
-                case "health":
+                case "score":
                     va = a.classification.healthScore;
                     vb = b.classification.healthScore;
                     break;
-                case "lastComm":
-                    va = a.statusInfo.dateTime ? new Date(a.statusInfo.dateTime).getTime() : 0;
-                    vb = b.statusInfo.dateTime ? new Date(b.statusInfo.dateTime).getTime() : 0;
+                case "status":
+                    va = severityRank(a.classification.severity);
+                    vb = severityRank(b.classification.severity);
+                    break;
+                case "power":
+                case "gps":
+                case "cellular":
+                case "installation":
+                case "hardware":
+                    var aCat = computeCategoryScores(a.classification);
+                    var bCat = computeCategoryScores(b.classification);
+                    va = aCat[col].score;
+                    vb = bCat[col].score;
                     break;
                 default:
                     va = 0; vb = 0;
@@ -2110,78 +2757,30 @@ DHD.FleetDashboard = (function () {
         return data;
     }
 
-    function severityRank(s) {
-        switch (s) {
-            case C.Severity.CRITICAL: return 0;
-            case C.Severity.WARNING: return 1;
-            case C.Severity.INFO: return 2;
-            case C.Severity.HEALTHY: return 3;
-            default: return 4;
-        }
-    }
-
-    // ── Search string builder (MyGeotab-style multi-field match) ──────
-
-    function buildSearchString(item) {
-        var device = item.device;
-        var cls = item.classification;
-        var parts = [
-            device.name || "",
-            device.serialNumber || "",
-            device.vehicleIdentificationNumber || "",
-            device.comment || "",
-            device.licensePlate || "",
-            device.productId ? "GO" + device.productId : "",
-            device.deviceType || ""
-        ];
-
-        // Groups — resolve names from cache
-        if (device.groups && device.groups.length > 0) {
-            device.groups.forEach(function (g) {
-                parts.push(DHD.DeviceCache.getGroupName(g.id));
-            });
-        }
-
-        // Issue category and severity (so users can type "critical", "gps", etc.)
-        parts.push(cls.severity || "");
-        parts.push(cls.primaryIssue || "");
-        if (cls.issues) {
-            cls.issues.forEach(function (issue) {
-                parts.push(issue.label || "");
-                parts.push(issue.category || "");
-            });
-        }
-
-        return parts.join(" ").toLowerCase();
-    }
-
-    // ── Events ─────────────────────────────────────────────────────────
+    // ── Events ──────────────────────────────────────────────────────
 
     function bindEvents() {
         if (_eventsBound) { return; }
         _eventsBound = true;
 
-        // Tile clicks
-        var tilesContainer = document.getElementById("dhdTiles");
-        if (tilesContainer) {
-            tilesContainer.addEventListener("click", function (e) {
-                var tile = e.target.closest("[data-tile]");
-                if (tile) {
-                    var key = tile.getAttribute("data-tile");
-                    _activeFilter = (_activeFilter === key) ? null : key;
-                    renderTiles();
-                    renderTable();
+        // Table row clicks
+        var tbody = document.getElementById("dhdTableBody");
+        if (tbody) {
+            tbody.addEventListener("click", function (e) {
+                var row = e.target.closest("[data-device-id]");
+                if (row && _onDeviceClick) {
+                    _onDeviceClick(row.getAttribute("data-device-id"));
                 }
             });
         }
 
-        // Table row / diagnose button clicks
-        var tbody = document.getElementById("dhdTableBody");
-        if (tbody) {
-            tbody.addEventListener("click", function (e) {
-                var btn = e.target.closest("[data-device-id]");
-                if (btn && _onDeviceClick) {
-                    _onDeviceClick(btn.getAttribute("data-device-id"));
+        // Attention list clicks
+        var attentionEl = document.getElementById("dhdNeedAttention");
+        if (attentionEl) {
+            attentionEl.addEventListener("click", function (e) {
+                var item = e.target.closest("[data-device-id]");
+                if (item && _onDeviceClick) {
+                    _onDeviceClick(item.getAttribute("data-device-id"));
                 }
             });
         }
@@ -2196,7 +2795,7 @@ DHD.FleetDashboard = (function () {
         }
 
         // Column sort
-        var headers = document.querySelectorAll("[data-sort]");
+        var headers = document.querySelectorAll("#dhdFleetView [data-sort]");
         headers.forEach(function (header) {
             header.addEventListener("click", function () {
                 var col = header.getAttribute("data-sort");
@@ -2210,10 +2809,24 @@ DHD.FleetDashboard = (function () {
                 renderTable();
             });
         });
+
+        // CSV export
+        var csvBtn = document.getElementById("dhdCsvBtn");
+        if (csvBtn) {
+            csvBtn.addEventListener("click", exportCSV);
+        }
+
+        // Print
+        var printBtn = document.getElementById("dhdPrintBtn");
+        if (printBtn) {
+            printBtn.addEventListener("click", function () {
+                window.print();
+            });
+        }
     }
 
     function updateSortIndicators() {
-        var headers = document.querySelectorAll("[data-sort]");
+        var headers = document.querySelectorAll("#dhdFleetView [data-sort]");
         headers.forEach(function (h) {
             h.classList.remove("dhd-sort--asc", "dhd-sort--desc");
             if (h.getAttribute("data-sort") === _sortCol) {
@@ -2222,19 +2835,46 @@ DHD.FleetDashboard = (function () {
         });
     }
 
-    // ── Utilities ──────────────────────────────────────────────────────
+    // ── CSV Export ───────────────────────────────────────────────────
 
-    function formatDate(dateStr) {
-        if (!dateStr) { return "N/A"; }
-        var d = new Date(dateStr);
-        var now = new Date();
-        var diffH = (now - d) / (1000 * 60 * 60);
+    function exportCSV() {
+        var filtered = getFilteredData();
+        filtered = sortData(filtered);
 
-        if (diffH < 1) { return Math.round(diffH * 60) + "m ago"; }
-        if (diffH < 24) { return Math.round(diffH) + "h ago"; }
-        if (diffH < 720) { return Math.round(diffH / 24) + "d ago"; }
-        return (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear();
+        var headers = ["Device Name", "Health Score", "Status", "Power", "GPS", "Cellular", "Installation", "Hardware"];
+        var rows = [headers.join(",")];
+
+        filtered.forEach(function (item) {
+            var cls = item.classification;
+            var catScores = computeCategoryScores(cls);
+            var level = getHealthLevel(cls.severity);
+
+            var row = [
+                '"' + (item.device.name || "").replace(/"/g, '""') + '"',
+                cls.healthScore,
+                '"' + level.label + '"',
+                catScores.power.score + " (" + catScores.power.count + ")",
+                catScores.gps.score + " (" + catScores.gps.count + ")",
+                catScores.cellular.score + " (" + catScores.cellular.count + ")",
+                catScores.installation.score + " (" + catScores.installation.count + ")",
+                catScores.hardware.score + " (" + catScores.hardware.count + ")"
+            ];
+            rows.push(row.join(","));
+        });
+
+        var csv = rows.join("\n");
+        var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "device-health-scorecard.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
+
+    // ── Utilities ───────────────────────────────────────────────────
 
     function escHtml(str) {
         var div = document.createElement("div");
@@ -2242,8 +2882,9 @@ DHD.FleetDashboard = (function () {
         return div.innerHTML;
     }
 
-    function capitalize(s) {
-        return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
+    function formatNum(n) {
+        if (n == null) { return "0"; }
+        return n.toLocaleString ? n.toLocaleString() : String(n);
     }
 
     return {
