@@ -324,20 +324,23 @@ geotab.addin.deviceHealthDiagnostics = (function () {
 (function () {
     if (typeof document === "undefined") { return; }
 
-    // Detect if we are running inside a MyGeotab iframe.
-    // MyGeotab sets window.geotab.addin AND loads the page inside an iframe,
-    // so if window !== window.top OR the referrer/URL contains "geotab.com",
-    // we are hosted by MyGeotab and should NOT use mock data.
+    // Detect if we are running inside MyGeotab.
+    // MyGeotab loads add-in HTML directly into the page (not in a separate iframe),
+    // so we detect by checking the hostname and hash fragment for MyGeotab patterns.
     function isInsideMyGeotab() {
         try {
-            // Check if loaded inside an iframe
             if (window !== window.top) { return true; }
         } catch (e) {
-            // Cross-origin iframe access throws — also means we're embedded
             return true;
         }
-        // Check URL parameters that MyGeotab might pass
-        if (window.location.search && window.location.search.indexOf("geotab") !== -1) {
+        // Check if the hostname is a MyGeotab domain
+        var host = window.location.hostname || "";
+        if (host.indexOf("geotab.com") !== -1 || host.indexOf("mygeotab.com") !== -1) {
+            return true;
+        }
+        // Check hash fragment for add-in pattern
+        var hash = window.location.hash || "";
+        if (hash.indexOf("addin-") !== -1) {
             return true;
         }
         return false;
