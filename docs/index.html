@@ -3477,6 +3477,33 @@ geotab.addin.deviceHealthDiagnostics = (function () {
 // Auto-start in standalone mode (no MyGeotab host)
 (function () {
     if (typeof document === "undefined") { return; }
+
+    // Detect if we are running inside a MyGeotab iframe.
+    // MyGeotab sets window.geotab.addin AND loads the page inside an iframe,
+    // so if window !== window.top OR the referrer/URL contains "geotab.com",
+    // we are hosted by MyGeotab and should NOT use mock data.
+    function isInsideMyGeotab() {
+        try {
+            // Check if loaded inside an iframe
+            if (window !== window.top) { return true; }
+        } catch (e) {
+            // Cross-origin iframe access throws — also means we're embedded
+            return true;
+        }
+        // Check URL parameters that MyGeotab might pass
+        if (window.location.search && window.location.search.indexOf("geotab") !== -1) {
+            return true;
+        }
+        return false;
+    }
+
+    if (isInsideMyGeotab()) {
+        // Inside MyGeotab — do NOT use mock data.
+        // MyGeotab will call initialize(api, page, callback) with the real API.
+        return;
+    }
+
+    // Standalone mode — use mock data after a delay
     var _hostCalled = false;
     var _origInit = geotab.addin.deviceHealthDiagnostics.initialize;
     geotab.addin.deviceHealthDiagnostics.initialize = function (api, page, cb) {
