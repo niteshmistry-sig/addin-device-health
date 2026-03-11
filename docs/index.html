@@ -3164,7 +3164,7 @@ if (typeof geotab === "undefined") {
     var geotab = { addin: {} };
 }
 
-geotab.addin.deviceHealthDiagnostics = (function () {
+geotab.addin.device_health_diagnostics = (function () {
     "use strict";
 
     var C = DHD.Constants;
@@ -3475,53 +3475,26 @@ geotab.addin.deviceHealthDiagnostics = (function () {
 })();
 
 // Auto-start in standalone mode (no MyGeotab host)
+// If MyGeotab calls initialize() with the real API, _hostCalled becomes true
+// and mock data is skipped. Otherwise, after a delay, mock data is used for preview.
 (function () {
     if (typeof document === "undefined") { return; }
 
-    // Detect if we are running inside MyGeotab.
-    // MyGeotab loads add-in HTML directly into the page (not in a separate iframe),
-    // so we detect by checking the hostname and hash fragment for MyGeotab patterns.
-    function isInsideMyGeotab() {
-        try {
-            if (window !== window.top) { return true; }
-        } catch (e) {
-            return true;
-        }
-        // Check if the hostname is a MyGeotab domain
-        var host = window.location.hostname || "";
-        if (host.indexOf("geotab.com") !== -1 || host.indexOf("mygeotab.com") !== -1) {
-            return true;
-        }
-        // Check hash fragment for add-in pattern
-        var hash = window.location.hash || "";
-        if (hash.indexOf("addin-") !== -1) {
-            return true;
-        }
-        return false;
-    }
-
-    if (isInsideMyGeotab()) {
-        // Inside MyGeotab — do NOT use mock data.
-        // MyGeotab will call initialize(api, page, callback) with the real API.
-        return;
-    }
-
-    // Standalone mode — use mock data after a delay
     var _hostCalled = false;
-    var _origInit = geotab.addin.deviceHealthDiagnostics.initialize;
-    geotab.addin.deviceHealthDiagnostics.initialize = function (api, page, cb) {
+    var _origInit = geotab.addin.device_health_diagnostics.initialize;
+    geotab.addin.device_health_diagnostics.initialize = function (api, page, cb) {
         _hostCalled = true;
         return _origInit(api, page, cb);
     };
     function tryMockInit() {
         if (!_hostCalled) {
-            geotab.addin.deviceHealthDiagnostics._initStandalone();
+            geotab.addin.device_health_diagnostics._initStandalone();
         }
     }
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", function () { setTimeout(tryMockInit, 200); });
+        document.addEventListener("DOMContentLoaded", function () { setTimeout(tryMockInit, 2000); });
     } else {
-        setTimeout(tryMockInit, 200);
+        setTimeout(tryMockInit, 2000);
     }
 })();
 
