@@ -119,13 +119,16 @@ DHD.FleetDashboard = (function () {
             { value: formatNum(metrics.issueCount), label: "Issues Detected", accent: metrics.issueCount > 0 ? "dhd-kpi-card--error" : "" }
         ];
 
-        var html = "";
+        var accentColors = { "dhd-kpi-card--success": "#2e7d32", "dhd-kpi-card--error": "#d32f2f", "": "#1976d2" };
+        var html = '<table style="width:100%;border-collapse:separate;border-spacing:16px 0;table-layout:fixed;margin-bottom:24px;"><tr>';
         cards.forEach(function (c) {
-            html += '<div class="dhd-kpi-card ' + c.accent + '" style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:8px !important;padding:24px 16px !important;text-align:center !important;box-shadow:0 1px 3px rgba(0,0,0,0.12) !important;">' +
-                '<div class="dhd-kpi-card__value" style="font-size:36px !important;font-weight:700 !important;line-height:1.1 !important;margin-bottom:4px !important;">' + c.value + '</div>' +
-                '<div class="dhd-kpi-card__label" style="font-size:11px !important;font-weight:600 !important;text-transform:uppercase !important;letter-spacing:0.8px !important;color:#616161 !important;">' + c.label + '</div>' +
-                '</div>';
+            var topColor = accentColors[c.accent] || "#1976d2";
+            html += '<td style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px 16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.12);border-top:4px solid ' + topColor + ';vertical-align:top;">' +
+                '<div style="font-size:36px;font-weight:700;line-height:1.1;margin-bottom:4px;">' + c.value + '</div>' +
+                '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:#616161;">' + c.label + '</div>' +
+                '</td>';
         });
+        html += '</tr></table>';
 
         container.innerHTML = html;
     }
@@ -183,8 +186,8 @@ DHD.FleetDashboard = (function () {
 
         // Center text
         if (centerEl) {
-            centerEl.innerHTML = '<span class="dhd-donut-center__count" style="font-size:28px !important;font-weight:700 !important;line-height:1.1 !important;display:block !important;">' + formatNum(metrics.totalDevices) + '</span>' +
-                '<span class="dhd-donut-center__label" style="font-size:11px !important;color:#616161 !important;text-transform:uppercase !important;letter-spacing:0.5px !important;">Devices</span>';
+            centerEl.innerHTML = '<span style="font-size:28px;font-weight:700;line-height:1.1;display:block;">' + formatNum(metrics.totalDevices) + '</span>' +
+                '<span style="font-size:11px;color:#616161;text-transform:uppercase;letter-spacing:0.5px;">Devices</span>';
         }
 
         // Legend
@@ -192,8 +195,8 @@ DHD.FleetDashboard = (function () {
             var lhtml = "";
             HEALTH_LEVELS.forEach(function (level) {
                 var count = metrics.statusCounts[level.key] || 0;
-                lhtml += '<span class="dhd-donut-legend__item" style="display:flex !important;align-items:center !important;gap:4px !important;font-size:11px !important;color:#616161 !important;">' +
-                    '<span class="dhd-donut-legend__dot" style="background:' + level.color + ';width:10px !important;height:10px !important;border-radius:50% !important;flex-shrink:0 !important;display:inline-block !important;"></span>' +
+                lhtml += '<span style="display:inline-block;margin:0 8px 4px 0;font-size:11px;color:#616161;white-space:nowrap;">' +
+                    '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + level.color + ';vertical-align:middle;margin-right:4px;"></span>' +
                     level.label + ' (' + count + ')' +
                     '</span>';
             });
@@ -240,18 +243,19 @@ DHD.FleetDashboard = (function () {
         severityColors[C.Severity.INFO] = "#0288d1";
         severityColors[C.Severity.HEALTHY] = "#4caf50";
 
-        var html = "";
+        var html = '<table style="width:100%;border-collapse:collapse;">';
         sorted.forEach(function (item) {
             var color = severityColors[item.severity] || "#9e9e9e";
             var barPct = Math.round((item.count / maxCount) * 100);
-            html += '<div class="dhd-issue-item" style="display:flex !important;align-items:center !important;padding:8px 0 !important;border-bottom:1px solid #e0e0e0 !important;gap:8px !important;">' +
-                '<span class="dhd-issue-item__indicator" style="background:' + color + ';width:8px !important;height:8px !important;border-radius:50% !important;flex-shrink:0 !important;display:inline-block !important;"></span>' +
-                '<span class="dhd-issue-item__label" style="flex:1 !important;font-size:13px !important;font-weight:500 !important;">' + escHtml(item.label) + '</span>' +
-                '<span class="dhd-issue-item__count" style="font-size:13px !important;font-weight:700 !important;min-width:24px !important;text-align:right !important;">' + item.count + '</span>' +
-                '<span class="dhd-issue-item__suffix" style="font-size:11px !important;color:#9e9e9e !important;">devices</span>' +
-                '<div class="dhd-issue-item__bar-wrap" style="width:60px !important;height:6px !important;background:#f5f5f5 !important;border-radius:3px !important;overflow:hidden !important;flex-shrink:0 !important;"><div class="dhd-issue-item__bar" style="width:' + barPct + '%;background:' + color + ';height:100% !important;border-radius:3px !important;"></div></div>' +
-                '</div>';
+            html += '<tr style="border-bottom:1px solid #e0e0e0;">' +
+                '<td style="width:12px;padding:8px 4px 8px 0;vertical-align:middle;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + color + ';"></span></td>' +
+                '<td style="padding:8px 4px;font-size:13px;font-weight:500;vertical-align:middle;">' + escHtml(item.label) + '</td>' +
+                '<td style="width:30px;padding:8px 4px;font-size:13px;font-weight:700;text-align:right;vertical-align:middle;">' + item.count + '</td>' +
+                '<td style="width:50px;padding:8px 4px;font-size:11px;color:#9e9e9e;vertical-align:middle;">devices</td>' +
+                '<td style="width:60px;padding:8px 0;vertical-align:middle;"><div style="width:100%;height:6px;background:#f5f5f5;border-radius:3px;overflow:hidden;"><div style="width:' + barPct + '%;height:100%;background:' + color + ';border-radius:3px;"></div></div></td>' +
+                '</tr>';
         });
+        html += '</table>';
 
         container.innerHTML = html;
     }
@@ -274,17 +278,17 @@ DHD.FleetDashboard = (function () {
             return;
         }
 
-        var html = "";
+        var html = '<table style="width:100%;border-collapse:collapse;">';
         withIssues.forEach(function (item, i) {
             var score = item.classification.healthScore;
             var color = getScoreColor(score);
-            var issueLabel = item.classification.issues.length > 0 ? item.classification.issues[0].label : "";
-            html += '<div class="dhd-performer-item" data-device-id="' + item.device.id + '" style="display:flex !important;align-items:center !important;padding:8px 0 !important;border-bottom:1px solid #e0e0e0 !important;cursor:pointer !important;">' +
-                '<span class="dhd-performer-rank" style="width:24px !important;font-size:13px !important;font-weight:700 !important;color:#9e9e9e !important;flex-shrink:0 !important;">' + (i + 1) + '.</span>' +
-                '<span class="dhd-performer-name" style="flex:1 !important;font-size:13px !important;color:#1976d2 !important;font-weight:500 !important;overflow:hidden !important;text-overflow:ellipsis !important;white-space:nowrap !important;">' + escHtml(item.device.name) + '</span>' +
-                '<span class="dhd-performer-score" style="color:' + color + ';font-size:14px !important;font-weight:700 !important;min-width:32px !important;text-align:right !important;flex-shrink:0 !important;">' + score + '</span>' +
-                '</div>';
+            html += '<tr data-device-id="' + item.device.id + '" style="cursor:pointer;border-bottom:1px solid #e0e0e0;">' +
+                '<td style="width:24px;padding:8px 4px 8px 0;font-size:13px;font-weight:700;color:#9e9e9e;vertical-align:middle;">' + (i + 1) + '.</td>' +
+                '<td style="padding:8px 4px;font-size:13px;color:#1976d2;font-weight:500;vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0;">' + escHtml(item.device.name) + '</td>' +
+                '<td style="width:40px;padding:8px 0 8px 4px;font-size:14px;font-weight:700;text-align:right;color:' + color + ';vertical-align:middle;">' + score + '</td>' +
+                '</tr>';
         });
+        html += '</table>';
 
         container.innerHTML = html;
     }
@@ -374,10 +378,10 @@ DHD.FleetDashboard = (function () {
     function renderScoreBar(score, eventCount) {
         var color = getScoreColor(score);
         var countStr = typeof eventCount === "number" ? ' <span style="color:#9e9e9e">(' + eventCount + ')</span>' : '';
-        return '<div class="dhd-score-bar" style="display:flex !important;align-items:center !important;gap:6px !important;min-width:100px !important;">' +
-            '<div class="dhd-score-bar__track" style="flex:1 !important;height:8px !important;background:#f5f5f5 !important;border-radius:4px !important;overflow:hidden !important;min-width:40px !important;"><div class="dhd-score-bar__fill" style="width:' + score + '%;background:' + color + ';height:100% !important;border-radius:4px !important;"></div></div>' +
-            '<span class="dhd-score-bar__text" style="color:' + color + ';font-size:12px !important;font-weight:600 !important;white-space:nowrap !important;">' + score + countStr + '</span>' +
-            '</div>';
+        return '<table style="width:100%;min-width:100px;border-collapse:collapse;"><tr>' +
+            '<td style="padding:0 6px 0 0;vertical-align:middle;"><div style="height:8px;background:#f5f5f5;border-radius:4px;overflow:hidden;min-width:40px;"><div style="width:' + score + '%;height:100%;background:' + color + ';border-radius:4px;"></div></div></td>' +
+            '<td style="padding:0;width:60px;font-size:12px;font-weight:600;white-space:nowrap;color:' + color + ';vertical-align:middle;">' + score + countStr + '</td>' +
+            '</tr></table>';
     }
 
     // ── Filtering ───────────────────────────────────────────────────

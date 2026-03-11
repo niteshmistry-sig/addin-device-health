@@ -19,46 +19,50 @@
         <div id="dhdError" class="dhd-error" style="display:none;"></div>
 
         <!-- Header bar -->
-        <div class="dhd-header" style="display:flex !important;align-items:center !important;justify-content:space-between !important;">
-            <h1 class="dhd-header__title" style="font-size:22px !important;font-weight:600 !important;margin:0 !important;">Device Health Diagnostics</h1>
-            <button id="dhdRefreshBtn" class="dhd-btn dhd-btn--refresh" title="Refresh">&#x21bb; Refresh</button>
-        </div>
+        <table class="dhd-header" style="width:100%;border-collapse:collapse;margin-bottom:24px;"><tr>
+            <td style="padding:0;"><h1 class="dhd-header__title" style="font-size:22px;font-weight:600;margin:0;">Device Health Diagnostics</h1></td>
+            <td style="padding:0;text-align:right;width:120px;"><button id="dhdRefreshBtn" class="dhd-btn dhd-btn--refresh" title="Refresh">&#x21bb; Refresh</button></td>
+        </tr></table>
 
         <!-- ═══ Fleet Dashboard View ═══ -->
         <div id="dhdFleetView" class="dhd-view dhd-view--active">
 
             <!-- KPI Summary Cards -->
-            <div id="dhdKpiRow" class="dhd-kpi-row" style="display:grid !important;grid-template-columns:repeat(4,1fr) !important;gap:16px !important;margin-bottom:24px !important;"></div>
+            <div id="dhdKpiRow" class="dhd-kpi-row"></div>
 
             <!-- Insights Row: Donut + Top 5 + Bottom 5 -->
-            <div id="dhdInsightsRow" class="dhd-insights-row" style="display:grid !important;grid-template-columns:1fr 1.5fr 1.5fr !important;gap:16px !important;margin-bottom:24px !important;">
-                <div class="dhd-insight-card" style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:8px !important;padding:24px !important;box-shadow:0 1px 3px rgba(0,0,0,0.12) !important;">
-                    <h3 class="dhd-insight-card__title" style="font-size:14px !important;font-weight:600 !important;margin:0 0 16px 0 !important;">Health Distribution</h3>
-                    <div class="dhd-donut-container" style="position:relative !important;width:180px !important;height:180px !important;margin:0 auto 16px !important;">
-                        <canvas id="dhdDonutChart" width="200" height="200" style="display:block !important;width:100% !important;height:100% !important;"></canvas>
-                        <div id="dhdDonutCenter" class="dhd-donut-center" style="position:absolute !important;top:50% !important;left:50% !important;transform:translate(-50%,-50%) !important;text-align:center !important;pointer-events:none !important;"></div>
+            <table id="dhdInsightsRow" class="dhd-insights-row" style="width:100%;border-collapse:separate;border-spacing:16px 0;table-layout:fixed;margin-bottom:24px;">
+                <tr>
+                <td style="width:25%;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.12);vertical-align:top;">
+                    <h3 class="dhd-insight-card__title" style="font-size:14px;font-weight:600;margin:0 0 16px 0;">Health Distribution</h3>
+                    <div class="dhd-donut-container" style="position:relative;width:180px;height:180px;margin:0 auto 16px;">
+                        <canvas id="dhdDonutChart" width="200" height="200" style="display:block;width:100%;height:100%;"></canvas>
+                        <div id="dhdDonutCenter" class="dhd-donut-center" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;"></div>
                     </div>
-                    <div id="dhdDonutLegend" class="dhd-donut-legend" style="display:flex !important;flex-wrap:wrap !important;justify-content:center !important;gap:8px 16px !important;"></div>
-                </div>
-                <div class="dhd-insight-card" style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:8px !important;padding:24px !important;box-shadow:0 1px 3px rgba(0,0,0,0.12) !important;">
-                    <h3 class="dhd-insight-card__title" style="font-size:14px !important;font-weight:600 !important;margin:0 0 16px 0 !important;">Top Issues</h3>
-                    <div id="dhdTopIssues" class="dhd-issue-list" style="padding:0 !important;margin:0 !important;"></div>
-                </div>
-                <div class="dhd-insight-card" style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:8px !important;padding:24px !important;box-shadow:0 1px 3px rgba(0,0,0,0.12) !important;">
-                    <h3 class="dhd-insight-card__title" style="font-size:14px !important;font-weight:600 !important;margin:0 0 16px 0 !important;">Devices Needing Attention</h3>
-                    <div id="dhdNeedAttention" class="dhd-performer-list" style="list-style:none !important;padding:0 !important;margin:0 !important;"></div>
-                </div>
-            </div>
+                    <div id="dhdDonutLegend" class="dhd-donut-legend" style="text-align:center;"></div>
+                </td>
+                <td style="width:37.5%;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.12);vertical-align:top;">
+                    <h3 class="dhd-insight-card__title" style="font-size:14px;font-weight:600;margin:0 0 16px 0;">Top Issues</h3>
+                    <div id="dhdTopIssues" class="dhd-issue-list"></div>
+                </td>
+                <td style="width:37.5%;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.12);vertical-align:top;">
+                    <h3 class="dhd-insight-card__title" style="font-size:14px;font-weight:600;margin:0 0 16px 0;">Devices Needing Attention</h3>
+                    <div id="dhdNeedAttention" class="dhd-performer-list"></div>
+                </td>
+                </tr>
+            </table>
 
             <!-- Table Header: count + search + export -->
-            <div id="dhdTableHeader" class="dhd-table-header" style="display:flex !important;align-items:center !important;justify-content:space-between !important;margin-bottom:16px !important;flex-wrap:wrap !important;gap:8px !important;">
-                <span id="dhdTableCount" class="dhd-table-header__count" style="font-size:16px !important;font-weight:600 !important;">All Devices (0)</span>
-                <div class="dhd-table-header__actions" style="display:flex !important;align-items:center !important;gap:8px !important;">
-                    <input type="text" id="dhdSearch" class="dhd-search" placeholder="Search devices…">
-                    <button id="dhdCsvBtn" class="dhd-btn dhd-btn--small" title="Export CSV">&#x2B07; CSV</button>
-                    <button id="dhdPrintBtn" class="dhd-btn dhd-btn--small" title="Print">&#x1F5A8; Print</button>
-                </div>
-            </div>
+            <table id="dhdTableHeader" class="dhd-table-header" style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+                <tr>
+                <td style="padding:0;font-size:16px;font-weight:600;"><span id="dhdTableCount">All Devices (0)</span></td>
+                <td style="padding:0;text-align:right;white-space:nowrap;">
+                    <input type="text" id="dhdSearch" class="dhd-search" placeholder="Search devices…" style="width:180px;padding:4px 8px;font-size:13px;border:1px solid #e0e0e0;border-radius:4px;vertical-align:middle;">
+                    <button id="dhdCsvBtn" class="dhd-btn dhd-btn--small" title="Export CSV" style="vertical-align:middle;margin-left:8px;">&#x2B07; CSV</button>
+                    <button id="dhdPrintBtn" class="dhd-btn dhd-btn--small" title="Print" style="vertical-align:middle;margin-left:4px;">&#x1F5A8; Print</button>
+                </td>
+                </tr>
+            </table>
 
             <!-- Device table -->
             <div class="dhd-table-wrap">
@@ -86,20 +90,22 @@
             <!-- Drill-down header (back btn + device name) -->
             <div id="dhdDrillHeader" class="dhd-drill-header"></div>
 
-            <div class="dhd-drill-grid" style="display:grid !important;grid-template-columns:1fr 1fr !important;gap:16px !important;">
-
-                <!-- Health Score -->
-                <section class="dhd-card" style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:8px !important;padding:24px !important;box-shadow:0 1px 3px rgba(0,0,0,0.12) !important;">
+            <table class="dhd-drill-grid" style="width:100%;border-collapse:separate;border-spacing:16px 0;table-layout:fixed;margin-bottom:16px;">
+                <tr>
+                <td style="width:50%;vertical-align:top;padding:0;background:#fff;border:1px solid #e0e0e0;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.12);">
+                    <div style="padding:24px;">
                     <h3 class="dhd-card__title">Health Score</h3>
                     <div id="dhdHealthScore"></div>
-                </section>
-
-                <!-- Active Issues -->
-                <section class="dhd-card" style="background:#fff !important;border:1px solid #e0e0e0 !important;border-radius:8px !important;padding:24px !important;box-shadow:0 1px 3px rgba(0,0,0,0.12) !important;">
+                    </div>
+                </td>
+                <td style="width:50%;vertical-align:top;padding:0;background:#fff;border:1px solid #e0e0e0;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.12);">
+                    <div style="padding:24px;">
                     <h3 class="dhd-card__title">Active Issues</h3>
                     <div id="dhdActiveIssues"></div>
-                </section>
-            </div>
+                    </div>
+                </td>
+                </tr>
+            </table>
 
             <!-- Root Cause Analysis -->
             <section class="dhd-card">
@@ -110,16 +116,18 @@
             <!-- Diagnostic Timeline Charts -->
             <section class="dhd-card">
                 <h3 class="dhd-card__title">Diagnostic Timeline</h3>
-                <div class="dhd-charts-grid" style="display:grid !important;grid-template-columns:1fr 1fr !important;gap:24px !important;">
-                    <div class="dhd-chart-container">
+                <table class="dhd-charts-grid" style="width:100%;border-collapse:separate;border-spacing:16px 0;table-layout:fixed;">
+                    <tr>
+                    <td style="width:50%;vertical-align:top;padding:0;">
                         <h4 class="dhd-chart-title">Battery Voltage (30 days)</h4>
-                        <canvas id="dhdVoltageChart"></canvas>
-                    </div>
-                    <div class="dhd-chart-container">
+                        <canvas id="dhdVoltageChart" style="display:block;width:100%;"></canvas>
+                    </td>
+                    <td style="width:50%;vertical-align:top;padding:0;">
                         <h4 class="dhd-chart-title">Cellular RSSI (30 days)</h4>
-                        <canvas id="dhdRSSIChart"></canvas>
-                    </div>
-                </div>
+                        <canvas id="dhdRSSIChart" style="display:block;width:100%;"></canvas>
+                    </td>
+                    </tr>
+                </table>
             </section>
 
             <!-- Fault History -->
