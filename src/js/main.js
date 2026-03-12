@@ -24,15 +24,15 @@ geotab.addin.device_health_diagnostics = function () {
     function showFleetView() {
         var fleet = document.getElementById("dhdFleetView");
         var drill = document.getElementById("dhdDrillView");
-        if (fleet) { fleet.classList.add("dhd-view--active"); }
-        if (drill) { drill.classList.remove("dhd-view--active"); }
+        if (fleet) { fleet.style.display = "block"; fleet.classList.add("dhd-view--active"); }
+        if (drill) { drill.style.display = "none"; drill.classList.remove("dhd-view--active"); }
     }
 
     function showDrillView() {
         var fleet = document.getElementById("dhdFleetView");
         var drill = document.getElementById("dhdDrillView");
-        if (fleet) { fleet.classList.remove("dhd-view--active"); }
-        if (drill) { drill.classList.add("dhd-view--active"); }
+        if (fleet) { fleet.style.display = "none"; fleet.classList.remove("dhd-view--active"); }
+        if (drill) { drill.style.display = "block"; drill.classList.add("dhd-view--active"); }
     }
 
     // ── Loading / Error states ─────────────────────────────────────────
