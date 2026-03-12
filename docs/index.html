@@ -1387,9 +1387,9 @@ DHD.FleetDashboard = (function () {
         var html = '<table style="width:100%;border-collapse:separate;border-spacing:16px 0;table-layout:fixed;margin-bottom:24px;"><tr>';
         cards.forEach(function (c) {
             var topColor = accentColors[c.accent] || "#1976d2";
-            html += '<td style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px 16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.12);border-top:4px solid ' + topColor + ';vertical-align:top;">' +
-                '<div style="font-size:36px;font-weight:700;line-height:1.1;margin-bottom:4px;">' + c.value + '</div>' +
-                '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:#616161;">' + c.label + '</div>' +
+            html += '<td style="width:25%;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px 8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.12);border-top:4px solid ' + topColor + ';vertical-align:top;overflow:hidden;">' +
+                '<div style="font-size:32px;font-weight:700;line-height:1.1;margin-bottom:4px;">' + c.value + '</div>' +
+                '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#616161;">' + c.label + '</div>' +
                 '</td>';
         });
         html += '</tr></table>';
@@ -1548,7 +1548,7 @@ DHD.FleetDashboard = (function () {
             var color = getScoreColor(score);
             html += '<tr data-device-id="' + item.device.id + '" style="cursor:pointer;border-bottom:1px solid #e0e0e0;">' +
                 '<td style="width:24px;padding:8px 4px 8px 0;font-size:13px;font-weight:700;color:#9e9e9e;vertical-align:middle;">' + (i + 1) + '.</td>' +
-                '<td style="padding:8px 4px;font-size:13px;color:#1976d2;font-weight:500;vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0;">' + escHtml(item.device.name) + '</td>' +
+                '<td style="padding:8px 4px;font-size:13px;color:#1976d2;font-weight:500;vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escHtml(item.device.name) + '</td>' +
                 '<td style="width:40px;padding:8px 0 8px 4px;font-size:14px;font-weight:700;text-align:right;color:' + color + ';vertical-align:middle;">' + score + '</td>' +
                 '</tr>';
         });
