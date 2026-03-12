@@ -3164,7 +3164,7 @@ if (typeof geotab === "undefined") {
     var geotab = { addin: {} };
 }
 
-geotab.addin.device_health_diagnostics = (function () {
+geotab.addin.device_health_diagnostics = function () {
     "use strict";
 
     var C = DHD.Constants;
@@ -3472,29 +3472,32 @@ geotab.addin.device_health_diagnostics = (function () {
             loadFleetData();
         }
     };
-})();
+};
 
 // Auto-start in standalone mode (no MyGeotab host)
-// If MyGeotab calls initialize() with the real API, _hostCalled becomes true
-// and mock data is skipped. Otherwise, after a delay, mock data is used for preview.
+// When running inside MyGeotab, the host calls the factory function
+// geotab.addin.device_health_diagnostics() and then calls initialize(api, state, cb).
+// In standalone mode (opening the HTML directly), we invoke the factory ourselves
+// and use mock data for preview.
 (function () {
     if (typeof document === "undefined") { return; }
 
-    var _hostCalled = false;
-    var _origInit = geotab.addin.device_health_diagnostics.initialize;
-    geotab.addin.device_health_diagnostics.initialize = function (api, page, cb) {
-        _hostCalled = true;
-        return _origInit(api, page, cb);
-    };
-    function tryMockInit() {
-        if (!_hostCalled) {
-            geotab.addin.device_health_diagnostics._initStandalone();
+    // If we're running standalone (not inside MyGeotab), the factory won't be called
+    // by any host. Wait briefly, then self-initialize with mock data.
+    function tryStandaloneInit() {
+        // Check if the factory is still a function (MyGeotab hasn't called it yet)
+        if (typeof geotab.addin.device_health_diagnostics === "function") {
+            // Factory not yet invoked by MyGeotab — we're standalone.
+            // Invoke it ourselves and use mock data.
+            var addin = geotab.addin.device_health_diagnostics();
+            addin._initStandalone();
         }
     }
+
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", function () { setTimeout(tryMockInit, 2000); });
+        document.addEventListener("DOMContentLoaded", function () { setTimeout(tryStandaloneInit, 2000); });
     } else {
-        setTimeout(tryMockInit, 2000);
+        setTimeout(tryStandaloneInit, 2000);
     }
 })();
 
