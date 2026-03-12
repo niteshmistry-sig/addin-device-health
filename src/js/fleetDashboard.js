@@ -120,15 +120,15 @@ DHD.FleetDashboard = (function () {
         ];
 
         var accentColors = { "dhd-kpi-card--success": "#2e7d32", "dhd-kpi-card--error": "#d32f2f", "": "#1976d2" };
-        var html = '<table style="width:100%;border-collapse:separate;border-spacing:16px 0;table-layout:fixed;margin-bottom:24px;"><tr>';
+        var html = '<div style="display:flex;gap:16px;margin-bottom:24px;">';
         cards.forEach(function (c) {
             var topColor = accentColors[c.accent] || "#1976d2";
-            html += '<td style="width:25%;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px 8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.12);border-top:4px solid ' + topColor + ';vertical-align:top;overflow:hidden;">' +
-                '<div style="font-size:32px;font-weight:700;line-height:1.1;margin-bottom:4px;">' + c.value + '</div>' +
-                '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#616161;">' + c.label + '</div>' +
-                '</td>';
+            html += '<div style="flex:1;min-width:0;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px 12px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.12);border-top:4px solid ' + topColor + ';">' +
+                '<div style="font-size:36px;font-weight:700;line-height:1.1;margin-bottom:4px;">' + c.value + '</div>' +
+                '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:#616161;">' + c.label + '</div>' +
+                '</div>';
         });
-        html += '</tr></table>';
+        html += '</div>';
 
         container.innerHTML = html;
     }
