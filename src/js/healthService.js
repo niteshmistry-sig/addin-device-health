@@ -109,13 +109,16 @@ DHD.HealthService = (function () {
             resultsLimit: 500
         }]);
 
-        // FaultData — all for this device
+        // FaultData — GoFault source so failureMode is populated
         calls.push(["Get", {
             typeName: "FaultData",
             search: {
                 deviceSearch: deviceSearch,
                 fromDate: dateSearch.fromDate,
-                toDate: dateSearch.toDate
+                toDate: dateSearch.toDate,
+                diagnosticSearch: {
+                    source: { id: "SourceGeotabGoId" }
+                }
             },
             resultsLimit: 5000
         }]);
@@ -128,8 +131,9 @@ DHD.HealthService = (function () {
                     statusData[diagId] = results[i];
                 });
 
-                var logRecords = results[16]; // index 16
-                var faults = results[17];     // index 17
+                var nDiag = C.ALL_DIAGNOSTIC_IDS.length;
+                var logRecords = results[nDiag];
+                var faults = results[nDiag + 1];
 
                 resolve({
                     statusData: statusData,

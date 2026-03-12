@@ -188,9 +188,10 @@ DHD.RootCauseEngine = (function () {
 
         // 2. Hardware Failure / RMA (90%)
         var hardwareFaults = faults.filter(function (f) {
-            var fmId = f.failureMode ? parseInt(f.failureMode.id, 10) : NaN;
-            var dId = f.diagnostic ? parseInt(f.diagnostic.id, 10) : NaN;
-            return C.HARDWARE_FAULT_CODES.indexOf(fmId) !== -1 || C.HARDWARE_FAULT_CODES.indexOf(dId) !== -1;
+            var ids = [];
+            if (f.failureMode && f.failureMode.id) { ids.push(parseInt(f.failureMode.id, 10)); }
+            if (f.diagnostic && f.diagnostic.id) { ids.push(parseInt(f.diagnostic.id, 10)); }
+            return ids.some(function (id) { return C.HARDWARE_FAULT_CODES.indexOf(id) !== -1; });
         });
         var flashErrors = sd[C.Diagnostics.FLASH_ERROR];
         var hasFlashErrors = flashErrors && flashErrors.length > 0 && latestValue(flashErrors) > 0;
@@ -225,7 +226,8 @@ DHD.RootCauseEngine = (function () {
         var crankingData = sd[C.Diagnostics.CRANKING_VOLTAGE];
         var hasLowVoltFault = faults.some(function (f) {
             var fmId = f.failureMode ? parseInt(f.failureMode.id, 10) : NaN;
-            return fmId === 135;
+            var dId = f.diagnostic ? parseInt(f.diagnostic.id, 10) : NaN;
+            return fmId === 135 || dId === 135;
         });
         var lastVoltage = latestValue(voltageData);
         var lastCranking = latestValue(crankingData);
@@ -276,7 +278,8 @@ DHD.RootCauseEngine = (function () {
         var canDisabled = sd[C.Diagnostics.CAN_DISABLED];
         var hasInstallFault = faults.some(function (f) {
             var fmId = f.failureMode ? parseInt(f.failureMode.id, 10) : NaN;
-            return fmId === 287;
+            var dId = f.diagnostic ? parseInt(f.diagnostic.id, 10) : NaN;
+            return fmId === 287 || dId === 287;
         });
         var hasCanIssue = (canInitFail && canInitFail.length > 0 && latestValue(canInitFail) > 0) ||
                           (canShort && canShort.length > 0 && latestValue(canShort) > 0);
@@ -454,7 +457,8 @@ DHD.RootCauseEngine = (function () {
         // 8. OEM Issues (85%)
         var oemFaults = faults.filter(function (f) {
             var fmId = f.failureMode ? parseInt(f.failureMode.id, 10) : NaN;
-            return C.OEM_FAULT_CODES.indexOf(fmId) !== -1;
+            var dId = f.diagnostic ? parseInt(f.diagnostic.id, 10) : NaN;
+            return C.OEM_FAULT_CODES.indexOf(fmId) !== -1 || C.OEM_FAULT_CODES.indexOf(dId) !== -1;
         });
 
         if (oemFaults.length > 0) {
