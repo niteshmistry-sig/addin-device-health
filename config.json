@@ -5,7 +5,7 @@
     "items": [
         {
             "url": "https://niteshmistry-sig.github.io/addin-device-health/index.html",
-            "path": "EngineMaintenanceLink/",
+            "path": "GettingStartedLink/",
             "menuName": {
                 "en": "Device Health Diagnostics"
             },
