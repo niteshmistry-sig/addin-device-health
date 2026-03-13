@@ -1,134 +1,2486 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <title>Device Health Diagnostics</title>
-  <link rel="stylesheet" href="styles/main.css?v=1" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Health Diagnostics</title>
+    <script>
+(function(){
+  var s=document.createElement("style");
+  s.setAttribute("data-dhd","true");
+  s.textContent="/*\n * style.css \u2014 Device Health Diagnostics \u2014 Scorecard UI\n * All selectors scoped under #dhdContainer for MyGeotab CSS isolation.\n */\n\n/* \u2500\u2500 Design Tokens \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n:root {\n    --dhd-color-primary: #1976d2;\n    --dhd-color-primary-light: #e3f2fd;\n    --dhd-color-success: #2e7d32;\n    --dhd-color-success-light: #e8f5e9;\n    --dhd-color-warning: #ed6c02;\n    --dhd-color-warning-light: #fff3e0;\n    --dhd-color-error: #d32f2f;\n    --dhd-color-error-light: #ffebee;\n    --dhd-color-info: #0288d1;\n    --dhd-color-info-light: #e1f5fe;\n    --dhd-color-text: #212121;\n    --dhd-color-text-secondary: #616161;\n    --dhd-color-text-hint: #9e9e9e;\n    --dhd-color-border: #e0e0e0;\n    --dhd-color-bg: #f5f5f5;\n    --dhd-color-surface: #ffffff;\n    --dhd-radius: 8px;\n    --dhd-radius-sm: 4px;\n    --dhd-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);\n    --dhd-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);\n    --dhd-font: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;\n    --dhd-space-xs: 4px;\n    --dhd-space-sm: 8px;\n    --dhd-space-md: 16px;\n    --dhd-space-lg: 24px;\n    --dhd-space-xl: 32px;\n\n    /* Health status colors */\n    --dhd-status-healthy: #4caf50;\n    --dhd-status-healthy-bg: #e8f5e9;\n    --dhd-status-info: #0288d1;\n    --dhd-status-info-bg: #e1f5fe;\n    --dhd-status-warning: #ff9800;\n    --dhd-status-warning-bg: #fff3e0;\n    --dhd-status-critical: #f44336;\n    --dhd-status-critical-bg: #ffebee;\n}\n\n/* \u2500\u2500 Reset & Base (scoped to #dhdContainer) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer {\n    font-family: var(--dhd-font) !important;\n    color: var(--dhd-color-text) !important;\n    background: var(--dhd-color-bg) !important;\n    padding: var(--dhd-space-lg) !important;\n    min-height: 100% !important;\n    position: relative !important;\n    line-height: 1.5 !important;\n    font-size: 14px !important;\n}\n\n#dhdContainer#dhdContainer *, #dhdContainer#dhdContainer *::before, #dhdContainer#dhdContainer *::after {\n    box-sizing: border-box !important;\n}\n\n/* Reset elements MyGeotab commonly overrides */\n#dhdContainer#dhdContainer h1,\n#dhdContainer#dhdContainer h2,\n#dhdContainer#dhdContainer h3,\n#dhdContainer#dhdContainer h4 {\n    font-family: var(--dhd-font) !important;\n    color: var(--dhd-color-text) !important;\n    line-height: 1.3 !important;\n    margin: 0 !important;\n    padding: 0 !important;\n    border: none !important;\n    background: none !important;\n}\n\n#dhdContainer#dhdContainer table {\n    border-collapse: collapse !important;\n    border-spacing: 0 !important;\n    margin: 0 !important;\n    padding: 0 !important;\n}\n\n#dhdContainer#dhdContainer th,\n#dhdContainer#dhdContainer td {\n    text-align: left !important;\n    vertical-align: middle !important;\n}\n\n#dhdContainer#dhdContainer ul {\n    list-style-type: disc !important;\n}\n\n#dhdContainer#dhdContainer input[type=\"text\"] {\n    -webkit-appearance: none !important;\n    -moz-appearance: none !important;\n    appearance: none !important;\n    background: var(--dhd-color-surface) !important;\n    color: var(--dhd-color-text) !important;\n    margin: 0 !important;\n}\n\n#dhdContainer#dhdContainer button {\n    font-family: var(--dhd-font) !important;\n    -webkit-appearance: none !important;\n    -moz-appearance: none !important;\n    appearance: none !important;\n    line-height: 1.4 !important;\n}\n\n#dhdContainer#dhdContainer span,\n#dhdContainer#dhdContainer div,\n#dhdContainer#dhdContainer section {\n    font-family: inherit !important;\n}\n\n/* \u2500\u2500 Views \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-view {\n    display: none !important;\n}\n\n#dhdContainer#dhdContainer .dhd-view--active {\n    display: block !important;\n}\n\n/* \u2500\u2500 Header \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-header {\n    display: flex !important;\n    align-items: center !important;\n    justify-content: space-between !important;\n    margin-bottom: var(--dhd-space-lg) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-header__title {\n    font-size: 22px !important;\n    font-weight: 600 !important;\n    margin: 0 !important;\n    color: var(--dhd-color-text) !important;\n}\n\n/* \u2500\u2500 Buttons \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-btn {\n    display: inline-flex !important;\n    align-items: center !important;\n    gap: var(--dhd-space-xs) !important;\n    padding: var(--dhd-space-sm) var(--dhd-space-md) !important;\n    font-family: var(--dhd-font) !important;\n    font-size: 13px !important;\n    font-weight: 500 !important;\n    border: 1px solid var(--dhd-color-border) !important;\n    border-radius: var(--dhd-radius-sm) !important;\n    background: var(--dhd-color-surface) !important;\n    color: var(--dhd-color-text) !important;\n    cursor: pointer !important;\n    transition: background 0.15s, border-color 0.15s !important;\n    text-decoration: none !important;\n    text-transform: none !important;\n    letter-spacing: normal !important;\n    box-shadow: none !important;\n    min-width: auto !important;\n    height: auto !important;\n}\n\n#dhdContainer#dhdContainer .dhd-btn:hover {\n    background: var(--dhd-color-bg) !important;\n    border-color: var(--dhd-color-text-hint) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-btn--refresh {\n    font-size: 14px !important;\n}\n\n#dhdContainer#dhdContainer .dhd-btn--back {\n    font-size: 14px !important;\n    color: var(--dhd-color-primary) !important;\n    border-color: var(--dhd-color-primary) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-btn--back:hover {\n    background: var(--dhd-color-primary-light) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-btn--small {\n    padding: var(--dhd-space-xs) var(--dhd-space-sm) !important;\n    font-size: 12px !important;\n}\n\n#dhdContainer#dhdContainer .dhd-btn--diagnose {\n    color: var(--dhd-color-primary) !important;\n    border-color: var(--dhd-color-primary) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-btn--diagnose:hover {\n    background: var(--dhd-color-primary-light) !important;\n}\n\n/* \u2500\u2500 Loading \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-loading {\n    align-items: center !important;\n    justify-content: center !important;\n    gap: var(--dhd-space-sm) !important;\n    padding: var(--dhd-space-xl) 0 !important;\n    color: var(--dhd-color-text-secondary) !important;\n    font-size: 14px !important;\n}\n\n#dhdContainer#dhdContainer .dhd-loading[style*=\"display: flex\"],\n#dhdContainer#dhdContainer .dhd-loading[style*=\"display:flex\"] {\n    display: flex !important;\n}\n\n#dhdContainer#dhdContainer .dhd-spinner {\n    width: 20px !important;\n    height: 20px !important;\n    border: 2px solid var(--dhd-color-border) !important;\n    border-top-color: var(--dhd-color-primary) !important;\n    border-radius: 50% !important;\n    animation: dhd-spin 0.7s linear infinite !important;\n}\n\n@keyframes dhd-spin {\n    to { transform: rotate(360deg); }\n}\n\n/* \u2500\u2500 Error \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-error {\n    background: var(--dhd-color-error-light) !important;\n    color: var(--dhd-color-error) !important;\n    padding: var(--dhd-space-md) !important;\n    border-radius: var(--dhd-radius) !important;\n    border: 1px solid var(--dhd-color-error) !important;\n    font-size: 13px !important;\n    margin-bottom: var(--dhd-space-md) !important;\n}\n\n/* \u2500\u2500 KPI Cards Row \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-kpi-row {\n    display: grid !important;\n    grid-template-columns: repeat(4, 1fr) !important;\n    gap: var(--dhd-space-md) !important;\n    margin-bottom: var(--dhd-space-lg) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-kpi-card {\n    background: var(--dhd-color-surface) !important;\n    border: 1px solid var(--dhd-color-border) !important;\n    border-radius: var(--dhd-radius) !important;\n    padding: var(--dhd-space-lg) var(--dhd-space-md) !important;\n    text-align: center !important;\n    box-shadow: var(--dhd-shadow) !important;\n    border-top: 4px solid var(--dhd-color-primary) !important;\n    transition: box-shadow 0.15s, transform 0.1s !important;\n}\n\n#dhdContainer#dhdContainer .dhd-kpi-card:hover {\n    box-shadow: var(--dhd-shadow-lg) !important;\n    transform: translateY(-1px) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-kpi-card--success {\n    border-top-color: var(--dhd-color-success) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-kpi-card--warning {\n    border-top-color: var(--dhd-color-warning) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-kpi-card--error {\n    border-top-color: var(--dhd-color-error) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-kpi-card__value {\n    font-size: 36px !important;\n    font-weight: 700 !important;\n    line-height: 1.1 !important;\n    color: var(--dhd-color-text) !important;\n    margin-bottom: var(--dhd-space-xs) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-kpi-card__label {\n    font-size: 11px !important;\n    font-weight: 600 !important;\n    text-transform: uppercase !important;\n    letter-spacing: 0.8px !important;\n    color: var(--dhd-color-text-secondary) !important;\n}\n\n/* \u2500\u2500 Insights Row (3-column) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-insights-row {\n    display: grid !important;\n    grid-template-columns: 1fr 1.5fr 1.5fr !important;\n    gap: var(--dhd-space-md) !important;\n    margin-bottom: var(--dhd-space-lg) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-insight-card {\n    background: var(--dhd-color-surface) !important;\n    border: 1px solid var(--dhd-color-border) !important;\n    border-radius: var(--dhd-radius) !important;\n    padding: var(--dhd-space-lg) !important;\n    box-shadow: var(--dhd-shadow) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-insight-card__title {\n    font-size: 14px !important;\n    font-weight: 600 !important;\n    margin: 0 0 var(--dhd-space-md) 0 !important;\n    color: var(--dhd-color-text) !important;\n}\n\n/* \u2500\u2500 Donut Chart \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-donut-container {\n    position: relative !important;\n    width: 180px !important;\n    height: 180px !important;\n    margin: 0 auto var(--dhd-space-md) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-donut-container canvas {\n    display: block !important;\n    width: 100% !important;\n    height: 100% !important;\n}\n\n#dhdContainer#dhdContainer .dhd-donut-center {\n    position: absolute !important;\n    top: 50% !important;\n    left: 50% !important;\n    transform: translate(-50%, -50%) !important;\n    text-align: center !important;\n    pointer-events: none !important;\n}\n\n#dhdContainer#dhdContainer .dhd-donut-center__count {\n    font-size: 28px !important;\n    font-weight: 700 !important;\n    line-height: 1.1 !important;\n    color: var(--dhd-color-text) !important;\n    display: block !important;\n}\n\n#dhdContainer#dhdContainer .dhd-donut-center__label {\n    font-size: 11px !important;\n    color: var(--dhd-color-text-secondary) !important;\n    text-transform: uppercase !important;\n    letter-spacing: 0.5px !important;\n}\n\n#dhdContainer#dhdContainer .dhd-donut-legend {\n    display: flex !important;\n    flex-wrap: wrap !important;\n    justify-content: center !important;\n    gap: var(--dhd-space-sm) var(--dhd-space-md) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-donut-legend__item {\n    display: flex !important;\n    align-items: center !important;\n    gap: var(--dhd-space-xs) !important;\n    font-size: 11px !important;\n    color: var(--dhd-color-text-secondary) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-donut-legend__dot {\n    width: 10px !important;\n    height: 10px !important;\n    border-radius: 50% !important;\n    flex-shrink: 0 !important;\n}\n\n/* \u2500\u2500 Issue List (Top Issues) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-issue-list {\n    padding: 0 !important;\n    margin: 0 !important;\n}\n\n#dhdContainer#dhdContainer .dhd-issue-item {\n    display: flex !important;\n    align-items: center !important;\n    padding: var(--dhd-space-sm) 0 !important;\n    border-bottom: 1px solid var(--dhd-color-border) !important;\n    gap: var(--dhd-space-sm) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-issue-item:last-child {\n    border-bottom: none !important;\n}\n\n#dhdContainer#dhdContainer .dhd-issue-item__indicator {\n    width: 8px !important;\n    height: 8px !important;\n    border-radius: 50% !important;\n    flex-shrink: 0 !important;\n}\n\n#dhdContainer#dhdContainer .dhd-issue-item__label {\n    flex: 1 !important;\n    font-size: 13px !important;\n    font-weight: 500 !important;\n    color: var(--dhd-color-text) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-issue-item__count {\n    font-size: 13px !important;\n    font-weight: 700 !important;\n    color: var(--dhd-color-text) !important;\n    min-width: 24px !important;\n    text-align: right !important;\n}\n\n#dhdContainer#dhdContainer .dhd-issue-item__suffix {\n    font-size: 11px !important;\n    color: var(--dhd-color-text-hint) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-issue-item__bar-wrap {\n    width: 60px !important;\n    height: 6px !important;\n    background: var(--dhd-color-bg) !important;\n    border-radius: 3px !important;\n    overflow: hidden !important;\n    flex-shrink: 0 !important;\n}\n\n#dhdContainer#dhdContainer .dhd-issue-item__bar {\n    height: 100% !important;\n    border-radius: 3px !important;\n}\n\n/* \u2500\u2500 Attention / Performer Lists \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-performer-list {\n    list-style: none !important;\n    padding: 0 !important;\n    margin: 0 !important;\n}\n\n#dhdContainer#dhdContainer .dhd-performer-item {\n    display: flex !important;\n    align-items: center !important;\n    padding: var(--dhd-space-sm) 0 !important;\n    border-bottom: 1px solid var(--dhd-color-border) !important;\n    cursor: pointer !important;\n}\n\n#dhdContainer#dhdContainer .dhd-performer-item:last-child {\n    border-bottom: none !important;\n}\n\n#dhdContainer#dhdContainer .dhd-performer-item:hover {\n    background: var(--dhd-color-primary-light) !important;\n    margin: 0 calc(-1 * var(--dhd-space-lg)) !important;\n    padding-left: var(--dhd-space-lg) !important;\n    padding-right: var(--dhd-space-lg) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-performer-rank {\n    width: 24px !important;\n    font-size: 13px !important;\n    font-weight: 700 !important;\n    color: var(--dhd-color-text-hint) !important;\n    flex-shrink: 0 !important;\n}\n\n#dhdContainer#dhdContainer .dhd-performer-name {\n    flex: 1 !important;\n    font-size: 13px !important;\n    color: var(--dhd-color-primary) !important;\n    font-weight: 500 !important;\n    overflow: hidden !important;\n    text-overflow: ellipsis !important;\n    white-space: nowrap !important;\n}\n\n#dhdContainer#dhdContainer .dhd-performer-score {\n    font-size: 14px !important;\n    font-weight: 700 !important;\n    min-width: 32px !important;\n    text-align: right !important;\n    flex-shrink: 0 !important;\n}\n\n/* \u2500\u2500 Table Header Bar \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-table-header {\n    display: flex !important;\n    align-items: center !important;\n    justify-content: space-between !important;\n    margin-bottom: var(--dhd-space-md) !important;\n    flex-wrap: wrap !important;\n    gap: var(--dhd-space-sm) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-table-header__count {\n    font-size: 16px !important;\n    font-weight: 600 !important;\n    color: var(--dhd-color-text) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-table-header__actions {\n    display: flex !important;\n    align-items: center !important;\n    gap: var(--dhd-space-sm) !important;\n}\n\n/* \u2500\u2500 Filter Bar / Search \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-search {\n    width: 220px !important;\n    padding: var(--dhd-space-xs) var(--dhd-space-sm) !important;\n    font-family: var(--dhd-font) !important;\n    font-size: 13px !important;\n    border: 1px solid var(--dhd-color-border) !important;\n    border-radius: var(--dhd-radius-sm) !important;\n    outline: none !important;\n    transition: border-color 0.15s !important;\n    height: auto !important;\n    line-height: 1.4 !important;\n    box-shadow: none !important;\n}\n\n#dhdContainer#dhdContainer .dhd-search:focus {\n    border-color: var(--dhd-color-primary) !important;\n}\n\n/* \u2500\u2500 Table \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-table-wrap {\n    overflow-x: auto !important;\n}\n\n#dhdContainer#dhdContainer .dhd-table {\n    width: 100% !important;\n    border-collapse: collapse !important;\n    background: var(--dhd-color-surface) !important;\n    border-radius: var(--dhd-radius) !important;\n    overflow: hidden !important;\n    box-shadow: var(--dhd-shadow) !important;\n    table-layout: auto !important;\n}\n\n#dhdContainer#dhdContainer .dhd-table__th {\n    text-align: left !important;\n    padding: var(--dhd-space-sm) var(--dhd-space-md) !important;\n    font-size: 11px !important;\n    font-weight: 600 !important;\n    text-transform: uppercase !important;\n    letter-spacing: 0.5px !important;\n    color: var(--dhd-color-text-secondary) !important;\n    background: var(--dhd-color-bg) !important;\n    border-bottom: 2px solid var(--dhd-color-border) !important;\n    border-top: none !important;\n    border-left: none !important;\n    border-right: none !important;\n    cursor: pointer !important;\n    user-select: none !important;\n    white-space: nowrap !important;\n    height: auto !important;\n}\n\n#dhdContainer#dhdContainer .dhd-table__th:hover {\n    color: var(--dhd-color-text) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-sort-icon::after {\n    content: \"\\2195\" !important;\n    margin-left: 4px !important;\n    font-size: 10px !important;\n    opacity: 0.4 !important;\n}\n\n#dhdContainer#dhdContainer .dhd-sort--asc .dhd-sort-icon::after {\n    content: \"\\2191\" !important;\n    opacity: 1 !important;\n}\n\n#dhdContainer#dhdContainer .dhd-sort--desc .dhd-sort-icon::after {\n    content: \"\\2193\" !important;\n    opacity: 1 !important;\n}\n\n#dhdContainer#dhdContainer .dhd-table__row {\n    cursor: pointer !important;\n    transition: background 0.1s !important;\n}\n\n#dhdContainer#dhdContainer .dhd-table__row:hover {\n    background: var(--dhd-color-primary-light) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-table__cell {\n    padding: var(--dhd-space-sm) var(--dhd-space-md) !important;\n    font-size: 13px !important;\n    border-bottom: 1px solid var(--dhd-color-border) !important;\n    border-top: none !important;\n    border-left: none !important;\n    border-right: none !important;\n    white-space: nowrap !important;\n    background: none !important;\n    height: auto !important;\n}\n\n#dhdContainer#dhdContainer .dhd-empty {\n    text-align: center !important;\n    padding: var(--dhd-space-xl) !important;\n    color: var(--dhd-color-text-hint) !important;\n    font-style: italic !important;\n}\n\n/* \u2500\u2500 Status Badges \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-badge {\n    display: inline-block !important;\n    padding: 2px 10px !important;\n    border-radius: 12px !important;\n    font-size: 11px !important;\n    font-weight: 600 !important;\n    text-transform: uppercase !important;\n    letter-spacing: 0.3px !important;\n    line-height: 1.6 !important;\n    border: none !important;\n    box-shadow: none !important;\n}\n\n#dhdContainer#dhdContainer .dhd-status-badge--healthy {\n    background: var(--dhd-status-healthy-bg) !important;\n    color: var(--dhd-status-healthy) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-status-badge--info {\n    background: var(--dhd-status-info-bg) !important;\n    color: var(--dhd-status-info) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-status-badge--warning {\n    background: var(--dhd-status-warning-bg) !important;\n    color: var(--dhd-status-warning) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-status-badge--critical {\n    background: var(--dhd-status-critical-bg) !important;\n    color: var(--dhd-status-critical) !important;\n}\n\n/* Keep old severity badges for drill-down view */\n#dhdContainer#dhdContainer .dhd-severity--critical {\n    background: var(--dhd-color-error-light) !important;\n    color: var(--dhd-color-error) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-severity--warning {\n    background: var(--dhd-color-warning-light) !important;\n    color: var(--dhd-color-warning) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-severity--info {\n    background: var(--dhd-color-info-light) !important;\n    color: var(--dhd-color-info) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-severity--healthy {\n    background: var(--dhd-color-success-light) !important;\n    color: var(--dhd-color-success) !important;\n}\n\n/* \u2500\u2500 Score Bar (inline in table cells) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-score-bar {\n    display: flex !important;\n    align-items: center !important;\n    gap: 6px !important;\n    min-width: 100px !important;\n}\n\n#dhdContainer#dhdContainer .dhd-score-bar__track {\n    flex: 1 !important;\n    height: 8px !important;\n    background: var(--dhd-color-bg) !important;\n    border-radius: 4px !important;\n    overflow: hidden !important;\n    min-width: 40px !important;\n}\n\n#dhdContainer#dhdContainer .dhd-score-bar__fill {\n    height: 100% !important;\n    border-radius: 4px !important;\n    transition: width 0.3s !important;\n}\n\n#dhdContainer#dhdContainer .dhd-score-bar__text {\n    font-size: 12px !important;\n    font-weight: 600 !important;\n    white-space: nowrap !important;\n    color: var(--dhd-color-text-secondary) !important;\n}\n\n/* \u2500\u2500 Health Score Bar (drill-down \u2014 legacy) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-health-bar {\n    display: flex !important;\n    align-items: center !important;\n    gap: var(--dhd-space-sm) !important;\n    width: 100% !important;\n    max-width: 120px !important;\n}\n\n#dhdContainer#dhdContainer .dhd-health-bar__fill {\n    height: 8px !important;\n    border-radius: 4px !important;\n    background: var(--dhd-color-success) !important;\n    transition: width 0.3s !important;\n    flex-shrink: 0 !important;\n}\n\n#dhdContainer#dhdContainer .dhd-health-bar__fill--warning {\n    background: var(--dhd-color-warning) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-health-bar__fill--critical {\n    background: var(--dhd-color-error) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-health-bar__text {\n    font-size: 12px !important;\n    font-weight: 600 !important;\n    color: var(--dhd-color-text-secondary) !important;\n    min-width: 24px !important;\n}\n\n/* \u2500\u2500 Drill-Down Header \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-drill-header {\n    display: flex !important;\n    align-items: center !important;\n    gap: var(--dhd-space-md) !important;\n    margin-bottom: var(--dhd-space-lg) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-drill-title h2 {\n    font-size: 20px !important;\n    font-weight: 600 !important;\n    margin: 0 !important;\n}\n\n#dhdContainer#dhdContainer .dhd-drill-serial {\n    font-size: 13px !important;\n    color: var(--dhd-color-text-secondary) !important;\n}\n\n/* \u2500\u2500 Cards \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-card {\n    background: var(--dhd-color-surface) !important;\n    border: 1px solid var(--dhd-color-border) !important;\n    border-radius: var(--dhd-radius) !important;\n    padding: var(--dhd-space-lg) !important;\n    margin-bottom: var(--dhd-space-md) !important;\n    box-shadow: var(--dhd-shadow) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-card__title {\n    font-size: 15px !important;\n    font-weight: 600 !important;\n    margin: 0 0 var(--dhd-space-md) 0 !important;\n    color: var(--dhd-color-text) !important;\n}\n\n/* \u2500\u2500 Drill-Down Grid (score + issues side by side) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-drill-grid {\n    display: grid !important;\n    grid-template-columns: 1fr 1fr !important;\n    gap: var(--dhd-space-md) !important;\n}\n\n/* \u2500\u2500 Health Score (drill-down) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-score {\n    text-align: center !important;\n    padding: var(--dhd-space-md) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-score__value {\n    font-size: 56px !important;\n    font-weight: 700 !important;\n    line-height: 1.1 !important;\n}\n\n#dhdContainer#dhdContainer .dhd-score__label {\n    font-size: 13px !important;\n    color: var(--dhd-color-text-secondary) !important;\n    margin-top: var(--dhd-space-xs) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-score--healthy .dhd-score__value { color: var(--dhd-color-success) !important; }\n#dhdContainer#dhdContainer .dhd-score--warning .dhd-score__value { color: var(--dhd-color-warning) !important; }\n#dhdContainer#dhdContainer .dhd-score--critical .dhd-score__value { color: var(--dhd-color-error) !important; }\n\n/* \u2500\u2500 Root Cause Cards \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-root-cause {\n    border: 1px solid var(--dhd-color-border) !important;\n    border-radius: var(--dhd-radius) !important;\n    padding: var(--dhd-space-md) !important;\n    margin-bottom: var(--dhd-space-sm) !important;\n    border-left: 4px solid var(--dhd-color-border) !important;\n    background: var(--dhd-color-surface) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-root-cause--critical { border-left-color: var(--dhd-color-error) !important; }\n#dhdContainer#dhdContainer .dhd-root-cause--warning  { border-left-color: var(--dhd-color-warning) !important; }\n#dhdContainer#dhdContainer .dhd-root-cause--info     { border-left-color: var(--dhd-color-info) !important; }\n\n#dhdContainer#dhdContainer .dhd-root-cause__header {\n    display: flex !important;\n    align-items: center !important;\n    gap: var(--dhd-space-sm) !important;\n    flex-wrap: wrap !important;\n    margin-bottom: var(--dhd-space-sm) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-root-cause__rank {\n    font-weight: 700 !important;\n    font-size: 14px !important;\n    color: var(--dhd-color-text) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-root-cause__category {\n    font-weight: 600 !important;\n    font-size: 14px !important;\n    color: var(--dhd-color-text) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-root-cause__confidence {\n    font-size: 12px !important;\n    color: var(--dhd-color-text-secondary) !important;\n    margin-left: auto !important;\n}\n\n#dhdContainer#dhdContainer .dhd-root-cause__explanation {\n    font-size: 13px !important;\n    color: var(--dhd-color-text-secondary) !important;\n    line-height: 1.5 !important;\n    margin-bottom: var(--dhd-space-sm) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-root-cause__actions {\n    font-size: 13px !important;\n}\n\n#dhdContainer#dhdContainer .dhd-root-cause__actions strong {\n    display: block !important;\n    margin-bottom: var(--dhd-space-xs) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-root-cause__actions ul {\n    margin: 0 !important;\n    padding-left: var(--dhd-space-lg) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-root-cause__actions li {\n    margin-bottom: var(--dhd-space-xs) !important;\n    line-height: 1.4 !important;\n}\n\n/* \u2500\u2500 Charts \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-charts-grid {\n    display: grid !important;\n    grid-template-columns: 1fr 1fr !important;\n    gap: var(--dhd-space-lg) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-chart-container {\n    min-height: 200px !important;\n}\n\n#dhdContainer#dhdContainer .dhd-chart-title {\n    font-size: 13px !important;\n    font-weight: 600 !important;\n    color: var(--dhd-color-text-secondary) !important;\n    margin: 0 0 var(--dhd-space-sm) 0 !important;\n}\n\n#dhdContainer#dhdContainer .dhd-chart-container canvas {\n    width: 100% !important;\n    display: block !important;\n}\n\n/* \u2500\u2500 Fault History Table \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-table--faults {\n    font-size: 12px !important;\n}\n\n#dhdContainer#dhdContainer .dhd-table--faults th {\n    padding: var(--dhd-space-sm) !important;\n    font-size: 11px !important;\n    font-weight: 600 !important;\n    text-transform: uppercase !important;\n    color: var(--dhd-color-text-secondary) !important;\n    background: var(--dhd-color-bg) !important;\n    border-bottom: 1px solid var(--dhd-color-border) !important;\n    border-top: none !important;\n    border-left: none !important;\n    border-right: none !important;\n    text-align: left !important;\n}\n\n#dhdContainer#dhdContainer .dhd-table--faults td {\n    padding: var(--dhd-space-sm) !important;\n    border-bottom: 1px solid var(--dhd-color-border) !important;\n    border-top: none !important;\n    border-left: none !important;\n    border-right: none !important;\n}\n\n/* \u2500\u2500 Device Info Grid \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-info-grid {\n    display: grid !important;\n    grid-template-columns: 1fr 1fr !important;\n    gap: var(--dhd-space-sm) var(--dhd-space-lg) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-info-item {\n    display: flex !important;\n    flex-direction: column !important;\n    gap: 2px !important;\n}\n\n#dhdContainer#dhdContainer .dhd-info-item__label {\n    font-size: 11px !important;\n    font-weight: 600 !important;\n    text-transform: uppercase !important;\n    letter-spacing: 0.5px !important;\n    color: var(--dhd-color-text-hint) !important;\n}\n\n#dhdContainer#dhdContainer .dhd-info-item__value {\n    font-size: 14px !important;\n    color: var(--dhd-color-text) !important;\n}\n\n/* \u2500\u2500 Empty State \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n#dhdContainer#dhdContainer .dhd-empty-state {\n    text-align: center !important;\n    padding: var(--dhd-space-lg) !important;\n    color: var(--dhd-color-text-hint) !important;\n    font-size: 13px !important;\n    font-style: italic !important;\n}\n\n/* \u2500\u2500 Print Styles \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n@media print {\n    body > *:not(#dhdContainer) {\n        display: none !important;\n    }\n    #dhdContainer {\n        padding: 0 !important;\n        background: white !important;\n    }\n    #dhdContainer#dhdContainer .dhd-header,\n    #dhdContainer#dhdContainer .dhd-btn,\n    #dhdContainer#dhdContainer .dhd-search,\n    #dhdContainer#dhdContainer #dhdDrillView {\n        display: none !important;\n    }\n    #dhdContainer#dhdContainer .dhd-kpi-card,\n    #dhdContainer#dhdContainer .dhd-insight-card {\n        box-shadow: none !important;\n        border: 1px solid #ccc !important;\n    }\n    #dhdContainer#dhdContainer .dhd-table {\n        box-shadow: none !important;\n    }\n}\n\n/* \u2500\u2500 Responsive \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n\n@media (max-width: 1100px) {\n    #dhdContainer#dhdContainer .dhd-insights-row {\n        grid-template-columns: 1fr !important;\n    }\n}\n\n@media (max-width: 900px) {\n    #dhdContainer#dhdContainer .dhd-kpi-row {\n        grid-template-columns: repeat(2, 1fr) !important;\n    }\n    #dhdContainer#dhdContainer .dhd-drill-grid {\n        grid-template-columns: 1fr !important;\n    }\n    #dhdContainer#dhdContainer .dhd-charts-grid {\n        grid-template-columns: 1fr !important;\n    }\n    #dhdContainer#dhdContainer .dhd-info-grid {\n        grid-template-columns: 1fr !important;\n    }\n}\n\n@media (max-width: 600px) {\n    #dhdContainer {\n        padding: var(--dhd-space-md) !important;\n    }\n    #dhdContainer#dhdContainer .dhd-kpi-row {\n        grid-template-columns: 1fr 1fr !important;\n    }\n    #dhdContainer#dhdContainer .dhd-header {\n        flex-direction: column !important;\n        align-items: flex-start !important;\n        gap: var(--dhd-space-sm) !important;\n    }\n    #dhdContainer#dhdContainer .dhd-table-header {\n        flex-direction: column !important;\n        align-items: flex-start !important;\n    }\n    #dhdContainer#dhdContainer .dhd-search {\n        width: 100% !important;\n    }\n}\n";
+  (document.head||document.documentElement).appendChild(s);
+})();
+</script>
 </head>
 <body>
+    <div id="dhdContainer" class="dhd-container">
 
-<div id="dhd-root">
-
-  <!-- Loading overlay -->
-  <div id="dhdLoading" class="dhd-loading" style="display:none;">
-    <div class="dhd-spinner"></div>
-    <span>Loading...</span>
-  </div>
-
-  <!-- Error banner -->
-  <div id="dhdError" class="dhd-error" style="display:none;"></div>
-
-  <!-- Toolbar -->
-  <div class="dhd-toolbar">
-    <button id="dhdRefreshBtn" class="dhd-btn dhd-btn-primary">&#x21bb; Refresh</button>
-  </div>
-
-  <!-- Fleet Dashboard View -->
-  <div id="dhdFleetView" class="dhd-view dhd-view--active">
-
-    <!-- KPI Summary Cards -->
-    <div id="dhdKpiRow" class="dhd-kpi-row"></div>
-
-    <!-- Insights Row -->
-    <div class="dhd-insights-row">
-      <div class="dhd-insight-card">
-        <h3 class="dhd-section-title">Health Distribution</h3>
-        <div class="dhd-donut-container">
-          <canvas id="dhdDonutChart" width="200" height="200"></canvas>
-          <div id="dhdDonutCenter" class="dhd-donut-center"></div>
+        <!-- Loading overlay -->
+        <div id="dhdLoading" class="dhd-loading" style="display:none;">
+            <div class="dhd-spinner"></div>
+            <span>Loading…</span>
         </div>
-        <div id="dhdDonutLegend" class="dhd-donut-legend"></div>
-      </div>
-      <div class="dhd-insight-card">
-        <h3 class="dhd-section-title">Top Issues</h3>
-        <div id="dhdTopIssues"></div>
-      </div>
-      <div class="dhd-insight-card">
-        <h3 class="dhd-section-title">Devices Needing Attention</h3>
-        <div id="dhdNeedAttention"></div>
-      </div>
-    </div>
 
-    <!-- Table Header -->
-    <div class="dhd-table-header">
-      <span id="dhdTableCount" class="dhd-table-count">All Devices (0)</span>
-      <div class="dhd-table-actions">
-        <input type="text" id="dhdSearch" class="dhd-input" placeholder="Search devices..." style="width:200px;">
-        <button id="dhdCsvBtn" class="dhd-btn dhd-btn-secondary" title="Export CSV">CSV</button>
-      </div>
-    </div>
+        <!-- Error banner -->
+        <div id="dhdError" class="dhd-error" style="display:none;"></div>
 
-    <!-- Device table -->
-    <div class="dhd-table-wrap">
-      <table class="dhd-table">
-        <thead>
-          <tr>
-            <th class="dhd-sortable" data-sort="name">Name <span class="dhd-sort-icon"></span></th>
-            <th class="dhd-sortable" data-sort="score">Health <span class="dhd-sort-icon"></span></th>
-            <th class="dhd-sortable" data-sort="status">Status <span class="dhd-sort-icon"></span></th>
-            <th class="dhd-sortable" data-sort="power">Power <span class="dhd-sort-icon"></span></th>
-            <th class="dhd-sortable" data-sort="gps">GPS <span class="dhd-sort-icon"></span></th>
-            <th class="dhd-sortable" data-sort="cellular">Cellular <span class="dhd-sort-icon"></span></th>
-            <th class="dhd-sortable" data-sort="installation">Install <span class="dhd-sort-icon"></span></th>
-            <th class="dhd-sortable" data-sort="hardware">Hardware <span class="dhd-sort-icon"></span></th>
-          </tr>
-        </thead>
-        <tbody id="dhdTableBody"></tbody>
-      </table>
-    </div>
-  </div>
+        <!-- Header bar -->
+        <table class="dhd-header" style="width:100%;border-collapse:collapse;margin-bottom:24px;"><tr>
+            <td style="padding:0;"><h1 class="dhd-header__title" style="font-size:22px;font-weight:600;margin:0;">Device Health Diagnostics</h1></td>
+            <td style="padding:0;text-align:right;width:120px;"><button id="dhdRefreshBtn" class="dhd-btn dhd-btn--refresh" title="Refresh">&#x21bb; Refresh</button></td>
+        </tr></table>
 
-  <!-- Device Drill-Down View -->
-  <div id="dhdDrillView" class="dhd-view">
-    <div id="dhdDrillHeader" class="dhd-drill-header"></div>
+        <!-- ═══ Fleet Dashboard View ═══ -->
+        <div id="dhdFleetView" class="dhd-view dhd-view--active">
 
-    <div class="dhd-drill-grid">
-      <div class="dhd-card">
-        <h3 class="dhd-section-title">Health Score</h3>
-        <div id="dhdHealthScore"></div>
-      </div>
-      <div class="dhd-card">
-        <h3 class="dhd-section-title">Active Issues</h3>
-        <div id="dhdActiveIssues"></div>
-      </div>
-    </div>
+            <!-- KPI Summary Cards -->
+            <div id="dhdKpiRow" class="dhd-kpi-row"></div>
 
-    <div class="dhd-card">
-      <h3 class="dhd-section-title">Root Cause Analysis</h3>
-      <div id="dhdRootCauses"></div>
-    </div>
+            <!-- Insights Row: Donut + Top 5 + Bottom 5 -->
+            <table id="dhdInsightsRow" class="dhd-insights-row" style="width:100%;border-collapse:separate;border-spacing:16px 0;table-layout:fixed;margin-bottom:24px;">
+                <tr>
+                <td style="width:25%;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.12);vertical-align:top;">
+                    <h3 class="dhd-insight-card__title" style="font-size:14px;font-weight:600;margin:0 0 16px 0;">Health Distribution</h3>
+                    <div class="dhd-donut-container" style="position:relative;width:180px;height:180px;margin:0 auto 16px;">
+                        <canvas id="dhdDonutChart" width="200" height="200" style="display:block;width:100%;height:100%;"></canvas>
+                        <div id="dhdDonutCenter" class="dhd-donut-center" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;"></div>
+                    </div>
+                    <div id="dhdDonutLegend" class="dhd-donut-legend" style="text-align:center;"></div>
+                </td>
+                <td style="width:37.5%;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.12);vertical-align:top;">
+                    <h3 class="dhd-insight-card__title" style="font-size:14px;font-weight:600;margin:0 0 16px 0;">Top Issues</h3>
+                    <div id="dhdTopIssues" class="dhd-issue-list"></div>
+                </td>
+                <td style="width:37.5%;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.12);vertical-align:top;">
+                    <h3 class="dhd-insight-card__title" style="font-size:14px;font-weight:600;margin:0 0 16px 0;">Devices Needing Attention</h3>
+                    <div id="dhdNeedAttention" class="dhd-performer-list"></div>
+                </td>
+                </tr>
+            </table>
 
-    <div class="dhd-card">
-      <h3 class="dhd-section-title">Diagnostic Timeline</h3>
-      <div class="dhd-charts-grid">
-        <div>
-          <h4 class="dhd-chart-title">Battery Voltage (30 days)</h4>
-          <canvas id="dhdVoltageChart"></canvas>
+            <!-- Table Header: count + search + export -->
+            <table id="dhdTableHeader" class="dhd-table-header" style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+                <tr>
+                <td style="padding:0;font-size:16px;font-weight:600;"><span id="dhdTableCount">All Devices (0)</span></td>
+                <td style="padding:0;text-align:right;white-space:nowrap;">
+                    <input type="text" id="dhdSearch" class="dhd-search" placeholder="Search devices…" style="width:180px;padding:4px 8px;font-size:13px;border:1px solid #e0e0e0;border-radius:4px;vertical-align:middle;">
+                    <button id="dhdCsvBtn" class="dhd-btn dhd-btn--small" title="Export CSV" style="vertical-align:middle;margin-left:8px;">&#x2B07; CSV</button>
+                    <button id="dhdPrintBtn" class="dhd-btn dhd-btn--small" title="Print" style="vertical-align:middle;margin-left:4px;">&#x1F5A8; Print</button>
+                </td>
+                </tr>
+            </table>
+
+            <!-- Device table -->
+            <div class="dhd-table-wrap">
+                <table class="dhd-table">
+                    <thead>
+                        <tr>
+                            <th class="dhd-table__th" data-sort="name">Name <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="score">Health <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="status">Status <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="power">Power <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="gps">GPS <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="cellular">Cellular <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="installation">Install <span class="dhd-sort-icon"></span></th>
+                            <th class="dhd-table__th" data-sort="hardware">Hardware <span class="dhd-sort-icon"></span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="dhdTableBody"></tbody>
+                </table>
+            </div>
         </div>
-        <div>
-          <h4 class="dhd-chart-title">Cellular RSSI (30 days)</h4>
-          <canvas id="dhdRSSIChart"></canvas>
+
+        <!-- ═══ Device Drill-Down View ═══ -->
+        <div id="dhdDrillView" class="dhd-view">
+
+            <!-- Drill-down header (back btn + device name) -->
+            <div id="dhdDrillHeader" class="dhd-drill-header"></div>
+
+            <table class="dhd-drill-grid" style="width:100%;border-collapse:separate;border-spacing:16px 0;table-layout:fixed;margin-bottom:16px;">
+                <tr>
+                <td style="width:50%;vertical-align:top;padding:0;background:#fff;border:1px solid #e0e0e0;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.12);">
+                    <div style="padding:24px;">
+                    <h3 class="dhd-card__title">Health Score</h3>
+                    <div id="dhdHealthScore"></div>
+                    </div>
+                </td>
+                <td style="width:50%;vertical-align:top;padding:0;background:#fff;border:1px solid #e0e0e0;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.12);">
+                    <div style="padding:24px;">
+                    <h3 class="dhd-card__title">Active Issues</h3>
+                    <div id="dhdActiveIssues"></div>
+                    </div>
+                </td>
+                </tr>
+            </table>
+
+            <!-- Root Cause Analysis -->
+            <section class="dhd-card">
+                <h3 class="dhd-card__title">Root Cause Analysis</h3>
+                <div id="dhdRootCauses"></div>
+            </section>
+
+            <!-- Diagnostic Timeline Charts -->
+            <section class="dhd-card">
+                <h3 class="dhd-card__title">Diagnostic Timeline</h3>
+                <table class="dhd-charts-grid" style="width:100%;border-collapse:separate;border-spacing:16px 0;table-layout:fixed;">
+                    <tr>
+                    <td style="width:50%;vertical-align:top;padding:0;">
+                        <h4 class="dhd-chart-title">Battery Voltage (30 days)</h4>
+                        <canvas id="dhdVoltageChart" style="display:block;width:100%;"></canvas>
+                    </td>
+                    <td style="width:50%;vertical-align:top;padding:0;">
+                        <h4 class="dhd-chart-title">Cellular RSSI (30 days)</h4>
+                        <canvas id="dhdRSSIChart" style="display:block;width:100%;"></canvas>
+                    </td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Fault History -->
+            <section class="dhd-card">
+                <h3 class="dhd-card__title">Fault History (Last 30 Days)</h3>
+                <div id="dhdFaultHistory"></div>
+            </section>
+
+            <!-- Device Info -->
+            <section class="dhd-card">
+                <h3 class="dhd-card__title">Device Information</h3>
+                <div id="dhdDeviceInfo"></div>
+            </section>
         </div>
-      </div>
     </div>
 
-    <div class="dhd-card">
-      <h3 class="dhd-section-title">Fault History (Last 30 Days)</h3>
-      <div id="dhdFaultHistory"></div>
-    </div>
+    <!-- Scripts (order matters — constants first, main last) -->
+    <script>
+/**
+ * constants.js — Single source of truth for Geotab diagnostic KnownIds,
+ * fault code mappings, and classification thresholds.
+ */
+var DHD = DHD || {};
 
-    <div class="dhd-card">
-      <h3 class="dhd-section-title">Device Information</h3>
-      <div id="dhdDeviceInfo"></div>
-    </div>
-  </div>
+DHD.Constants = (function () {
+    "use strict";
 
-</div>
+    // ── StatusData diagnostic KnownIds (16 total) ──────────────────────
 
-<script src="scripts/main.js?v=1"></script>
+    var Diagnostics = {
+        // Power
+        VOLTAGE: "DiagnosticGoDeviceVoltageId",
+        CRANKING_VOLTAGE: "DiagnosticCrankingVoltageId",
+
+        // GPS
+        GPS_NOT_RESPONDING: "DiagnosticGpsNotRespondingId",
+        GPS_ANTENNA_UNPLUGGED: "DiagnosticGpsAntennaUnpluggedId",
+        GPS_ANTENNA_SHORT: "DiagnosticGpsAntennaShortCircuitId",
+
+        // Cellular
+        CELLULAR_RSSI: "DiagnosticCellularRssiId",
+        INTERMITTENT_CONNECTION: "DiagnosticIntermittentConnectionCommunicationsId",
+
+        // Harness
+        HARNESS_STANDARD: "DiagnosticStandardHarnessDetectedId",
+        HARNESS_6PIN: "DiagnosticHarnessDetected6PinId",
+        HARNESS_9PIN: "DiagnosticHarnessDetected9PinId",
+
+        // CAN bus
+        CAN_INIT_FAIL: "DiagnosticCanBusFailedToInitializeId",
+        CAN_SHORT: "DiagnosticCanBusShortId",
+        CAN_DISABLED: "DiagnosticCanBusDisabledId",
+
+        // Device
+        UNPLUGGED: "DiagnosticDeviceHasBeenUnpluggedId",
+        FLASH_ERROR: "DiagnosticFlashErrorCountId",
+        BOOTLOADER_FAIL: "DiagnosticBootloaderUpdateHasFailedId"
+    };
+
+    // Ordered list for multiCall StatusData requests
+    var ALL_DIAGNOSTIC_IDS = [
+        Diagnostics.VOLTAGE,
+        Diagnostics.CRANKING_VOLTAGE,
+        Diagnostics.GPS_NOT_RESPONDING,
+        Diagnostics.GPS_ANTENNA_UNPLUGGED,
+        Diagnostics.GPS_ANTENNA_SHORT,
+        Diagnostics.CELLULAR_RSSI,
+        Diagnostics.INTERMITTENT_CONNECTION,
+        Diagnostics.HARNESS_STANDARD,
+        Diagnostics.HARNESS_6PIN,
+        Diagnostics.HARNESS_9PIN,
+        Diagnostics.CAN_INIT_FAIL,
+        Diagnostics.CAN_SHORT,
+        Diagnostics.CAN_DISABLED,
+        Diagnostics.UNPLUGGED,
+        Diagnostics.FLASH_ERROR,
+        Diagnostics.BOOTLOADER_FAIL
+    ];
+
+    // ── Fault code → category mapping ──────────────────────────────────
+
+    var FaultCategories = {
+        128: "hardware",   // Flash Fail
+        135: "power",      // Low Voltage
+        287: "installation", // Bad Install
+        297: "hardware",   // RAM failure
+        450: "hardware",   // RMA required
+        467: "hardware",   // Water damage
+        468: "hardware",   // Water damage
+        488: "oem",        // SWC issue
+        491: "oem"         // SWC issue
+    };
+
+    var HARDWARE_FAULT_CODES = [128, 297, 450, 467, 468];
+    var OEM_FAULT_CODES = [488, 491];
+
+    // ── Thresholds ─────────────────────────────────────────────────────
+
+    var Voltage = {
+        DEAD: 7,
+        LOW: 9,
+        WARNING: 11
+    };
+
+    var RSSI = {
+        NO_SIGNAL: -113,
+        POOR: -95,
+        FAIR: -85
+    };
+
+    var OfflineHours = {
+        NORMAL_SLEEP: 24,
+        EXTENDED: 72
+    };
+
+    // ── Severity levels ────────────────────────────────────────────────
+
+    var Severity = {
+        CRITICAL: "critical",
+        WARNING: "warning",
+        INFO: "info",
+        HEALTHY: "healthy"
+    };
+
+    // ── Issue categories ───────────────────────────────────────────────
+
+    var Category = {
+        UNPLUGGED: "unplugged",
+        HARDWARE: "hardware",
+        POWER: "power",
+        INSTALLATION: "installation",
+        GPS: "gps",
+        CELLULAR: "cellular",
+        FIRMWARE: "firmware",
+        OEM: "oem",
+        OFFLINE: "offline",
+        HEALTHY: "healthy"
+    };
+
+    // ── Health score deductions ─────────────────────────────────────────
+
+    var ScoreDeductions = {
+        critical: 40,
+        warning: 20,
+        info: 5
+    };
+
+    return {
+        Diagnostics: Diagnostics,
+        ALL_DIAGNOSTIC_IDS: ALL_DIAGNOSTIC_IDS,
+        FaultCategories: FaultCategories,
+        HARDWARE_FAULT_CODES: HARDWARE_FAULT_CODES,
+        OEM_FAULT_CODES: OEM_FAULT_CODES,
+        Voltage: Voltage,
+        RSSI: RSSI,
+        OfflineHours: OfflineHours,
+        Severity: Severity,
+        Category: Category,
+        ScoreDeductions: ScoreDeductions
+    };
+})();
+
+</script>
+    <script>
+/**
+ * deviceCache.js — Caches Device + Group data via multiCall at startup.
+ * Provides O(1) lookups by device ID.
+ */
+var DHD = DHD || {};
+
+DHD.DeviceCache = (function () {
+    "use strict";
+
+    var _devices = {};   // id → device object
+    var _groups = {};    // id → group object
+    var _loaded = false;
+
+    /**
+     * Load all devices and groups in a single multiCall.
+     * @param {Object} api - Geotab API object
+     * @returns {Promise}
+     */
+    function load(api) {
+        return new Promise(function (resolve, reject) {
+            api.multiCall([
+                ["Get", { typeName: "Device", resultsLimit: 50000 }],
+                ["Get", { typeName: "Group", resultsLimit: 10000 }]
+            ], function (results) {
+                var deviceList = results[0];
+                var groupList = results[1];
+
+                _devices = {};
+                deviceList.forEach(function (d) {
+                    _devices[d.id] = d;
+                });
+
+                _groups = {};
+                groupList.forEach(function (g) {
+                    _groups[g.id] = g;
+                });
+
+                _loaded = true;
+                resolve();
+            }, function (err) {
+                reject(err);
+            });
+        });
+    }
+
+    /**
+     * Get device by ID.
+     * @param {string} id
+     * @returns {Object|null}
+     */
+    function getDevice(id) {
+        return _devices[id] || null;
+    }
+
+    /**
+     * Get all devices as an array.
+     * @returns {Object[]}
+     */
+    function getAllDevices() {
+        return Object.keys(_devices).map(function (id) {
+            return _devices[id];
+        });
+    }
+
+    /**
+     * Get group name by ID.
+     * @param {string} id
+     * @returns {string}
+     */
+    function getGroupName(id) {
+        var g = _groups[id];
+        return g ? (g.name || id) : id;
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    function isLoaded() {
+        return _loaded;
+    }
+
+    return {
+        load: load,
+        getDevice: getDevice,
+        getAllDevices: getAllDevices,
+        getGroupName: getGroupName,
+        isLoaded: isLoaded
+    };
+})();
+
+</script>
+    <script>
+/**
+ * healthService.js — API fetch layer for fleet-level and device drill-down data.
+ */
+var DHD = DHD || {};
+
+DHD.HealthService = (function () {
+    "use strict";
+
+    var C = DHD.Constants;
+
+    /**
+     * Fetch fleet-level health data (2 API calls via multiCall):
+     *  1. DeviceStatusInfo for every device
+     *  2. FaultData (GoFault source, last 30 days)
+     *
+     * @param {Object} api
+     * @returns {Promise<{statusInfos: Object[], faultsByDevice: Object}>}
+     */
+    function fetchFleetHealth(api) {
+        var now = new Date();
+        var thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        return new Promise(function (resolve, reject) {
+            api.multiCall([
+                ["Get", {
+                    typeName: "DeviceStatusInfo",
+                    resultsLimit: 50000
+                }],
+                ["Get", {
+                    typeName: "FaultData",
+                    search: {
+                        fromDate: thirtyDaysAgo.toISOString(),
+                        toDate: now.toISOString(),
+                        diagnosticSearch: {
+                            source: { id: "SourceGeotabGoId" }
+                        }
+                    },
+                    resultsLimit: 100000
+                }]
+            ], function (results) {
+                var statusInfos = results[0];
+                var faults = results[1];
+
+                // Index faults by device ID for O(1) lookup
+                var faultsByDevice = {};
+                faults.forEach(function (f) {
+                    var devId = f.device ? f.device.id : null;
+                    if (devId) {
+                        if (!faultsByDevice[devId]) {
+                            faultsByDevice[devId] = [];
+                        }
+                        faultsByDevice[devId].push(f);
+                    }
+                });
+
+                resolve({
+                    statusInfos: statusInfos,
+                    faultsByDevice: faultsByDevice
+                });
+            }, function (err) {
+                reject(err);
+            });
+        });
+    }
+
+    /**
+     * Fetch device drill-down data (18 API calls via multiCall):
+     *  - 16x StatusData (one per diagnostic KnownId, 30-day range)
+     *  - 1x LogRecord (last 500 for GPS staleness)
+     *  - 1x FaultData (all faults for device)
+     *
+     * @param {Object} api
+     * @param {string} deviceId
+     * @returns {Promise<{statusData: Object, logRecords: Object[], faults: Object[]}>}
+     */
+    function fetchDeviceDrillDown(api, deviceId) {
+        var now = new Date();
+        var thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        var deviceSearch = { id: deviceId };
+        var dateSearch = {
+            fromDate: thirtyDaysAgo.toISOString(),
+            toDate: now.toISOString()
+        };
+
+        var calls = [];
+
+        // 16 StatusData calls — one per diagnostic
+        C.ALL_DIAGNOSTIC_IDS.forEach(function (diagId) {
+            calls.push(["Get", {
+                typeName: "StatusData",
+                search: {
+                    deviceSearch: deviceSearch,
+                    diagnosticSearch: { id: diagId },
+                    fromDate: dateSearch.fromDate,
+                    toDate: dateSearch.toDate
+                },
+                resultsLimit: 5000
+            }]);
+        });
+
+        // LogRecord — last 500
+        calls.push(["Get", {
+            typeName: "LogRecord",
+            search: {
+                deviceSearch: deviceSearch,
+                fromDate: dateSearch.fromDate,
+                toDate: dateSearch.toDate
+            },
+            resultsLimit: 500
+        }]);
+
+        // FaultData — GoFault source so failureMode is populated
+        calls.push(["Get", {
+            typeName: "FaultData",
+            search: {
+                deviceSearch: deviceSearch,
+                fromDate: dateSearch.fromDate,
+                toDate: dateSearch.toDate,
+                diagnosticSearch: {
+                    source: { id: "SourceGeotabGoId" }
+                }
+            },
+            resultsLimit: 5000
+        }]);
+
+        return new Promise(function (resolve, reject) {
+            api.multiCall(calls, function (results) {
+                // Map diagnostic results by KnownId
+                var statusData = {};
+                C.ALL_DIAGNOSTIC_IDS.forEach(function (diagId, i) {
+                    statusData[diagId] = results[i];
+                });
+
+                var nDiag = C.ALL_DIAGNOSTIC_IDS.length;
+                var logRecords = results[nDiag];
+                var faults = results[nDiag + 1];
+
+                resolve({
+                    statusData: statusData,
+                    logRecords: logRecords,
+                    faults: faults
+                });
+            }, function (err) {
+                reject(err);
+            });
+        });
+    }
+
+    return {
+        fetchFleetHealth: fetchFleetHealth,
+        fetchDeviceDrillDown: fetchDeviceDrillDown
+    };
+})();
+
+</script>
+    <script>
+/**
+ * rootCauseEngine.js — Decision tree and health scoring engine.
+ *
+ * Two entry points:
+ *  - classifyDevice()  : lightweight fleet-level classification
+ *  - analyzeDevice()   : full drill-down root cause analysis
+ */
+var DHD = DHD || {};
+
+DHD.RootCauseEngine = (function () {
+    "use strict";
+
+    var C = DHD.Constants;
+
+    // ── Helpers ────────────────────────────────────────────────────────
+
+    function hoursAgo(dateStr) {
+        if (!dateStr) { return Infinity; }
+        var dt = new Date(dateStr);
+        return (Date.now() - dt.getTime()) / (1000 * 60 * 60);
+    }
+
+    function hasFaultCode(faults, code) {
+        return faults.some(function (f) {
+            return f.diagnostic && String(f.diagnostic.id) === String(code);
+        });
+    }
+
+    function hasFaultCodes(faults, codes) {
+        return codes.some(function (code) {
+            return hasFaultCode(faults, code);
+        });
+    }
+
+    function latestValue(statusRecords) {
+        if (!statusRecords || statusRecords.length === 0) { return null; }
+        var sorted = statusRecords.slice().sort(function (a, b) {
+            return new Date(b.dateTime) - new Date(a.dateTime);
+        });
+        return sorted[0].data;
+    }
+
+    function faultCodesForDevice(faults) {
+        var codes = [];
+        faults.forEach(function (f) {
+            if (f.diagnostic && f.diagnostic.id) {
+                var num = parseInt(f.diagnostic.id, 10);
+                if (!isNaN(num)) {
+                    codes.push(num);
+                }
+            }
+            if (f.failureMode && f.failureMode.id) {
+                var fmId = parseInt(f.failureMode.id, 10);
+                if (!isNaN(fmId)) {
+                    codes.push(fmId);
+                }
+            }
+        });
+        return codes;
+    }
+
+    // ── Fleet-level classification ─────────────────────────────────────
+
+    /**
+     * Lightweight classification using DeviceStatusInfo + FaultData.
+     * @param {Object} statusInfo - DeviceStatusInfo record
+     * @param {Object[]} faults - FaultData for this device
+     * @param {Object} device - Device from cache
+     * @returns {{ issues: Object[], primaryIssue: string, severity: string, healthScore: number }}
+     */
+    function classifyDevice(statusInfo, faults, device) {
+        var issues = [];
+        faults = faults || [];
+
+        var isCommunicating = statusInfo.isDeviceCommunicating;
+        var offlineH = hoursAgo(statusInfo.dateTime);
+
+        // Offline
+        if (!isCommunicating) {
+            if (offlineH > C.OfflineHours.EXTENDED) {
+                issues.push({ category: C.Category.OFFLINE, severity: C.Severity.CRITICAL,
+                    label: "Offline > 72h" });
+            } else if (offlineH > C.OfflineHours.NORMAL_SLEEP) {
+                issues.push({ category: C.Category.OFFLINE, severity: C.Severity.WARNING,
+                    label: "Offline > 24h" });
+            }
+        }
+
+        // Check fault codes
+        var codes = faultCodesForDevice(faults);
+        if (codes.some(function (c) { return C.HARDWARE_FAULT_CODES.indexOf(c) !== -1; })) {
+            issues.push({ category: C.Category.HARDWARE, severity: C.Severity.CRITICAL,
+                label: "Hardware Failure" });
+        }
+        if (codes.indexOf(135) !== -1) {
+            issues.push({ category: C.Category.POWER, severity: C.Severity.WARNING,
+                label: "Low Battery" });
+        }
+        if (codes.indexOf(287) !== -1) {
+            issues.push({ category: C.Category.INSTALLATION, severity: C.Severity.WARNING,
+                label: "Loose Install" });
+        }
+        if (codes.some(function (c) { return C.OEM_FAULT_CODES.indexOf(c) !== -1; })) {
+            issues.push({ category: C.Category.OEM, severity: C.Severity.INFO,
+                label: "OEM Issue" });
+        }
+
+        // Firmware mismatch
+        if (device && device.parameterVersion != null && device.parameterVersionOnDevice != null &&
+            device.parameterVersion !== device.parameterVersionOnDevice) {
+            issues.push({ category: C.Category.FIRMWARE, severity: C.Severity.INFO,
+                label: "Firmware Pending" });
+        }
+
+        // GPS — position stuck at 0,0 or very old
+        if (statusInfo.latitude === 0 && statusInfo.longitude === 0 && isCommunicating) {
+            issues.push({ category: C.Category.GPS, severity: C.Severity.WARNING,
+                label: "GPS Issue" });
+        }
+
+        // Determine primary issue and overall severity
+        var severityOrder = [C.Severity.CRITICAL, C.Severity.WARNING, C.Severity.INFO];
+        var primaryIssue = C.Category.HEALTHY;
+        var severity = C.Severity.HEALTHY;
+
+        for (var s = 0; s < severityOrder.length; s++) {
+            for (var i = 0; i < issues.length; i++) {
+                if (issues[i].severity === severityOrder[s]) {
+                    primaryIssue = issues[i].category;
+                    severity = issues[i].severity;
+                    s = severityOrder.length; // break outer
+                    break;
+                }
+            }
+        }
+
+        var healthScore = computeHealthScore(issues, offlineH, isCommunicating);
+
+        return {
+            issues: issues,
+            primaryIssue: primaryIssue,
+            severity: severity,
+            healthScore: healthScore
+        };
+    }
+
+    // ── Full drill-down analysis ───────────────────────────────────────
+
+    /**
+     * Full decision-tree analysis using StatusData + LogRecords + FaultData.
+     * @param {Object} device - Device from cache
+     * @param {Object} statusInfo - DeviceStatusInfo record
+     * @param {Object} drillData - { statusData, logRecords, faults } from healthService
+     * @returns {{ rootCauses: Object[], healthScore: number, issues: Object[] }}
+     */
+    function analyzeDevice(device, statusInfo, drillData) {
+        var sd = drillData.statusData;
+        var faults = drillData.faults || [];
+        var logRecords = drillData.logRecords || [];
+        var rootCauses = [];
+        var issues = [];
+        var rank = 0;
+        var isCommunicating = statusInfo ? statusInfo.isDeviceCommunicating : false;
+        var offlineH = statusInfo ? hoursAgo(statusInfo.dateTime) : Infinity;
+
+        // 1. Unplugged (95%)
+        var unpluggedData = sd[C.Diagnostics.UNPLUGGED];
+        if (unpluggedData && unpluggedData.length > 0) {
+            var lastUnplug = latestValue(unpluggedData);
+            if (lastUnplug && lastUnplug > 0) {
+                rank++;
+                rootCauses.push({
+                    rank: rank,
+                    category: C.Category.UNPLUGGED,
+                    confidence: 95,
+                    severity: C.Severity.CRITICAL,
+                    explanation: "The device has reported an unplugged event. The GO device connector may have been removed from the vehicle\u2019s OBD-II port or power source.",
+                    actions: [
+                        "Verify the GO device is firmly seated in the OBD-II port.",
+                        "Check for physical damage to the connector or port.",
+                        "Inspect the wiring harness if a T-harness is used.",
+                        "If recently serviced, confirm the device was reconnected."
+                    ]
+                });
+                issues.push({ category: C.Category.UNPLUGGED, severity: C.Severity.CRITICAL, label: "Unplugged" });
+            }
+        }
+
+        // 2. Hardware Failure / RMA (90%)
+        var hardwareFaults = faults.filter(function (f) {
+            var ids = [];
+            if (f.failureMode && f.failureMode.id) { ids.push(parseInt(f.failureMode.id, 10)); }
+            if (f.diagnostic && f.diagnostic.id) { ids.push(parseInt(f.diagnostic.id, 10)); }
+            return ids.some(function (id) { return C.HARDWARE_FAULT_CODES.indexOf(id) !== -1; });
+        });
+        var flashErrors = sd[C.Diagnostics.FLASH_ERROR];
+        var hasFlashErrors = flashErrors && flashErrors.length > 0 && latestValue(flashErrors) > 0;
+
+        if (hardwareFaults.length > 0 || hasFlashErrors) {
+            rank++;
+            var hwExplanation = "Hardware-level faults detected.";
+            if (hasFlashErrors) {
+                hwExplanation += " Flash memory errors indicate possible internal component failure.";
+            }
+            if (hardwareFaults.length > 0) {
+                hwExplanation += " Fault codes suggest the device may require replacement (RMA).";
+            }
+            rootCauses.push({
+                rank: rank,
+                category: C.Category.HARDWARE,
+                confidence: 90,
+                severity: C.Severity.CRITICAL,
+                explanation: hwExplanation,
+                actions: [
+                    "Contact Geotab support to initiate an RMA (Return Merchandise Authorization).",
+                    "Check for water damage or physical tampering on the device.",
+                    "Document the fault codes for the support case.",
+                    "Prepare a replacement device for swap."
+                ]
+            });
+            issues.push({ category: C.Category.HARDWARE, severity: C.Severity.CRITICAL, label: "Hardware Failure" });
+        }
+
+        // 3. Power / Voltage (75-90%)
+        var voltageData = sd[C.Diagnostics.VOLTAGE];
+        var crankingData = sd[C.Diagnostics.CRANKING_VOLTAGE];
+        var hasLowVoltFault = faults.some(function (f) {
+            var fmId = f.failureMode ? parseInt(f.failureMode.id, 10) : NaN;
+            var dId = f.diagnostic ? parseInt(f.diagnostic.id, 10) : NaN;
+            return fmId === 135 || dId === 135;
+        });
+        var lastVoltage = latestValue(voltageData);
+        var lastCranking = latestValue(crankingData);
+
+        if (hasLowVoltFault || (lastVoltage !== null && lastVoltage < C.Voltage.WARNING)) {
+            rank++;
+            var voltConf = 75;
+            var voltSev = C.Severity.WARNING;
+            var voltExpl = "";
+
+            if (lastVoltage !== null && lastVoltage < C.Voltage.DEAD) {
+                voltConf = 90;
+                voltSev = C.Severity.CRITICAL;
+                voltExpl = "Vehicle battery voltage is critically low (" + lastVoltage.toFixed(1) + "V). The battery may be dead or disconnected.";
+            } else if (lastVoltage !== null && lastVoltage < C.Voltage.LOW) {
+                voltConf = 85;
+                voltSev = C.Severity.CRITICAL;
+                voltExpl = "Vehicle battery voltage is very low (" + lastVoltage.toFixed(1) + "V). The battery is likely failing or being drained.";
+            } else if (lastVoltage !== null) {
+                voltExpl = "Vehicle battery voltage is below normal (" + lastVoltage.toFixed(1) + "V). This may indicate a weak battery or parasitic drain.";
+            } else {
+                voltExpl = "Low voltage fault code detected, but no recent voltage readings are available.";
+            }
+
+            if (lastCranking !== null && lastCranking < C.Voltage.LOW) {
+                voltExpl += " Cranking voltage was also low (" + lastCranking.toFixed(1) + "V), suggesting battery or starter issues.";
+            }
+
+            rootCauses.push({
+                rank: rank,
+                category: C.Category.POWER,
+                confidence: voltConf,
+                severity: voltSev,
+                explanation: voltExpl,
+                actions: [
+                    "Test the vehicle battery with a multimeter or battery tester.",
+                    "Check for parasitic drains (aftermarket accessories left on).",
+                    "Verify the alternator is charging properly.",
+                    "If the vehicle is stored long-term, consider a battery maintainer."
+                ]
+            });
+            issues.push({ category: C.Category.POWER, severity: voltSev, label: "Low Battery" });
+        }
+
+        // 4. Installation / Harness (75%)
+        var canInitFail = sd[C.Diagnostics.CAN_INIT_FAIL];
+        var canShort = sd[C.Diagnostics.CAN_SHORT];
+        var canDisabled = sd[C.Diagnostics.CAN_DISABLED];
+        var hasInstallFault = faults.some(function (f) {
+            var fmId = f.failureMode ? parseInt(f.failureMode.id, 10) : NaN;
+            var dId = f.diagnostic ? parseInt(f.diagnostic.id, 10) : NaN;
+            return fmId === 287 || dId === 287;
+        });
+        var hasCanIssue = (canInitFail && canInitFail.length > 0 && latestValue(canInitFail) > 0) ||
+                          (canShort && canShort.length > 0 && latestValue(canShort) > 0);
+
+        if (hasInstallFault || hasCanIssue) {
+            rank++;
+            var instExpl = "Installation issues detected.";
+            if (hasInstallFault) {
+                instExpl += " The device reported a bad-install fault, suggesting it is not properly connected to the vehicle.";
+            }
+            if (hasCanIssue) {
+                instExpl += " CAN bus communication problems indicate a wiring or connector issue.";
+            }
+
+            rootCauses.push({
+                rank: rank,
+                category: C.Category.INSTALLATION,
+                confidence: 75,
+                severity: C.Severity.WARNING,
+                explanation: instExpl,
+                actions: [
+                    "Re-seat the GO device in the OBD-II port.",
+                    "Inspect the T-harness connections for corrosion or loose pins.",
+                    "Verify the correct harness type is used for this vehicle.",
+                    "Check that CAN bus wiring is not pinched or damaged."
+                ]
+            });
+            issues.push({ category: C.Category.INSTALLATION, severity: C.Severity.WARNING, label: "Loose Install" });
+        }
+
+        // 5. GPS Issues (60-90%)
+        var gpsNotResp = sd[C.Diagnostics.GPS_NOT_RESPONDING];
+        var gpsUnplugged = sd[C.Diagnostics.GPS_ANTENNA_UNPLUGGED];
+        var gpsShort = sd[C.Diagnostics.GPS_ANTENNA_SHORT];
+
+        var hasGpsAntennaFault = (gpsUnplugged && gpsUnplugged.length > 0 && latestValue(gpsUnplugged) > 0) ||
+                                (gpsShort && gpsShort.length > 0 && latestValue(gpsShort) > 0);
+        var hasGpsNotResponding = gpsNotResp && gpsNotResp.length > 0 && latestValue(gpsNotResp) > 0;
+
+        // Check for communicating-but-no-GPS-updates pattern
+        var gpsStale = false;
+        if (isCommunicating && logRecords.length > 0) {
+            var sortedLogs = logRecords.slice().sort(function (a, b) {
+                return new Date(b.dateTime) - new Date(a.dateTime);
+            });
+            var lastLog = new Date(sortedLogs[0].dateTime);
+            var logAgeH = (Date.now() - lastLog.getTime()) / (1000 * 60 * 60);
+            if (logAgeH > 4) {
+                gpsStale = true;
+            }
+        }
+
+        if (hasGpsAntennaFault || hasGpsNotResponding || gpsStale) {
+            rank++;
+            var gpsConf = 60;
+            var gpsSev = C.Severity.WARNING;
+            var gpsExpl = "";
+
+            if (hasGpsAntennaFault) {
+                gpsConf = 90;
+                gpsSev = C.Severity.CRITICAL;
+                gpsExpl = "GPS antenna fault detected (unplugged or short circuit). The device cannot acquire satellite position.";
+            } else if (hasGpsNotResponding) {
+                gpsConf = 80;
+                gpsExpl = "The GPS module is not responding. This may be a hardware issue or severe signal blockage.";
+            } else {
+                gpsExpl = "The device is communicating but GPS data is stale. The device may be in a location with poor sky visibility (underground parking, dense urban canyon).";
+            }
+
+            rootCauses.push({
+                rank: rank,
+                category: C.Category.GPS,
+                confidence: gpsConf,
+                severity: gpsSev,
+                explanation: gpsExpl,
+                actions: [
+                    "Verify the GPS antenna connection on the device.",
+                    "Move the vehicle to an open-sky area and check for GPS lock.",
+                    "Check if a metallic windshield tint is blocking GPS signals.",
+                    "If using an external antenna, inspect the cable and mount."
+                ]
+            });
+            issues.push({ category: C.Category.GPS, severity: gpsSev, label: "GPS Issue" });
+        }
+
+        // 6. Cellular / Connectivity (55-85%)
+        var rssiData = sd[C.Diagnostics.CELLULAR_RSSI];
+        var intermittent = sd[C.Diagnostics.INTERMITTENT_CONNECTION];
+        var lastRSSI = latestValue(rssiData);
+        var hasIntermittent = intermittent && intermittent.length > 0 && latestValue(intermittent) > 0;
+
+        var cellIssue = false;
+        var cellConf = 55;
+        var cellSev = C.Severity.INFO;
+        var cellExpl = "";
+
+        if (lastRSSI !== null && lastRSSI < C.RSSI.NO_SIGNAL) {
+            cellIssue = true;
+            cellConf = 85;
+            cellSev = C.Severity.CRITICAL;
+            cellExpl = "Cellular signal is at no-signal level (" + lastRSSI + " dBm). The device cannot communicate with the server.";
+        } else if (lastRSSI !== null && lastRSSI < C.RSSI.POOR) {
+            cellIssue = true;
+            cellConf = 70;
+            cellSev = C.Severity.WARNING;
+            cellExpl = "Cellular signal is poor (" + lastRSSI + " dBm). Data uploads may be delayed or incomplete.";
+        } else if (hasIntermittent) {
+            cellIssue = true;
+            cellConf = 65;
+            cellSev = C.Severity.WARNING;
+            cellExpl = "Intermittent connectivity detected. The device is cycling between connected and disconnected states.";
+        } else if (!isCommunicating && offlineH > C.OfflineHours.NORMAL_SLEEP) {
+            cellIssue = true;
+            cellConf = 60;
+            cellSev = offlineH > C.OfflineHours.EXTENDED ? C.Severity.CRITICAL : C.Severity.WARNING;
+            cellExpl = "The device has been offline for " + Math.round(offlineH) + " hours.";
+            if (offlineH > C.OfflineHours.EXTENDED) {
+                cellExpl += " Extended offline periods may indicate the vehicle is in a no-coverage area, the device has lost power, or there is a cellular modem issue.";
+            }
+        }
+
+        if (cellIssue) {
+            rank++;
+            rootCauses.push({
+                rank: rank,
+                category: C.Category.CELLULAR,
+                confidence: cellConf,
+                severity: cellSev,
+                explanation: cellExpl,
+                actions: [
+                    "Check the vehicle\u2019s typical operating area for cellular coverage.",
+                    "Verify the device\u2019s SIM card is properly seated.",
+                    "Try a power cycle by disconnecting and reconnecting the device.",
+                    "If in a known dead zone, wait for the vehicle to move to coverage."
+                ]
+            });
+            issues.push({ category: C.Category.CELLULAR, severity: cellSev, label: "Connectivity Issue" });
+        }
+
+        // 7. Firmware (95%)
+        var bootloaderFail = sd[C.Diagnostics.BOOTLOADER_FAIL];
+        var hasBootFail = bootloaderFail && bootloaderFail.length > 0 && latestValue(bootloaderFail) > 0;
+        var hasFwMismatch = device && device.parameterVersion != null &&
+                            device.parameterVersionOnDevice != null &&
+                            device.parameterVersion !== device.parameterVersionOnDevice;
+
+        if (hasBootFail || hasFwMismatch) {
+            rank++;
+            var fwSev = hasBootFail ? C.Severity.WARNING : C.Severity.INFO;
+            var fwExpl = "";
+            if (hasBootFail) {
+                fwExpl = "A bootloader update has failed on this device. The device may not be running the expected firmware version.";
+            } else {
+                fwExpl = "The device has a pending configuration update (parameter version " +
+                    device.parameterVersion + " vs on-device " + device.parameterVersionOnDevice +
+                    "). It will apply on next communication.";
+            }
+
+            rootCauses.push({
+                rank: rank,
+                category: C.Category.FIRMWARE,
+                confidence: 95,
+                severity: fwSev,
+                explanation: fwExpl,
+                actions: [
+                    "If bootloader failed, contact Geotab support for a manual firmware push.",
+                    "Ensure the device has stable power and connectivity for firmware updates.",
+                    "For pending config, the device will auto-update on next check-in.",
+                    "Avoid making additional config changes until the current update completes."
+                ]
+            });
+            issues.push({ category: C.Category.FIRMWARE, severity: fwSev, label: hasBootFail ? "Firmware Failure" : "Firmware Pending" });
+        }
+
+        // 8. OEM Issues (85%)
+        var oemFaults = faults.filter(function (f) {
+            var fmId = f.failureMode ? parseInt(f.failureMode.id, 10) : NaN;
+            var dId = f.diagnostic ? parseInt(f.diagnostic.id, 10) : NaN;
+            return C.OEM_FAULT_CODES.indexOf(fmId) !== -1 || C.OEM_FAULT_CODES.indexOf(dId) !== -1;
+        });
+
+        if (oemFaults.length > 0) {
+            rank++;
+            rootCauses.push({
+                rank: rank,
+                category: C.Category.OEM,
+                confidence: 85,
+                severity: C.Severity.INFO,
+                explanation: "OEM-related fault codes (SWC) detected. These typically relate to vehicle-specific steering-wheel-control or aftermarket integration issues.",
+                actions: [
+                    "Check if aftermarket steering wheel controls are installed.",
+                    "Verify the T-harness is compatible with this vehicle make/model.",
+                    "Consult the Geotab vehicle compatibility list for known issues.",
+                    "These faults generally do not affect core tracking functionality."
+                ]
+            });
+            issues.push({ category: C.Category.OEM, severity: C.Severity.INFO, label: "OEM Issue" });
+        }
+
+        var healthScore = computeHealthScore(issues, offlineH, isCommunicating);
+
+        return {
+            rootCauses: rootCauses,
+            healthScore: healthScore,
+            issues: issues
+        };
+    }
+
+    // ── Health score computation ────────────────────────────────────────
+
+    function computeHealthScore(issues, offlineH, isCommunicating) {
+        var score = 100;
+
+        issues.forEach(function (issue) {
+            var deduction = C.ScoreDeductions[issue.severity] || 0;
+            score -= deduction;
+        });
+
+        // Offline duration penalty
+        if (!isCommunicating && offlineH > C.OfflineHours.NORMAL_SLEEP) {
+            var extraH = offlineH - C.OfflineHours.NORMAL_SLEEP;
+            score -= Math.min(20, Math.round(extraH / 24) * 5);
+        }
+
+        return Math.max(0, Math.min(100, score));
+    }
+
+    return {
+        classifyDevice: classifyDevice,
+        analyzeDevice: analyzeDevice
+    };
+})();
+
+</script>
+    <script>
+/**
+ * diagnosticTimeline.js — Canvas-based line charts for voltage and RSSI trends.
+ * No external charting library — pure canvas rendering.
+ */
+var DHD = DHD || {};
+
+DHD.DiagnosticTimeline = (function () {
+    "use strict";
+
+    var C = DHD.Constants;
+    var PADDING = { top: 20, right: 20, bottom: 40, left: 50 };
+    var COLORS = {
+        line: "#1976d2",
+        point: "#1565c0",
+        grid: "#e0e0e0",
+        text: "#616161",
+        thresholdCritical: "rgba(244, 67, 54, 0.6)",
+        thresholdWarning: "rgba(255, 152, 0, 0.6)",
+        thresholdOk: "rgba(76, 175, 80, 0.3)"
+    };
+
+    /**
+     * Render a voltage chart on a canvas element.
+     * @param {string} canvasId - DOM id of the canvas
+     * @param {Object[]} statusRecords - StatusData records for voltage
+     */
+    function renderVoltageChart(canvasId, statusRecords) {
+        var thresholds = [
+            { value: C.Voltage.DEAD, color: COLORS.thresholdCritical, label: "Dead (7V)" },
+            { value: C.Voltage.LOW, color: COLORS.thresholdWarning, label: "Low (9V)" },
+            { value: C.Voltage.WARNING, color: COLORS.thresholdWarning, label: "Warning (11V)" }
+        ];
+        renderChart(canvasId, statusRecords, thresholds, "Voltage (V)", 0, 16);
+    }
+
+    /**
+     * Render an RSSI chart on a canvas element.
+     * @param {string} canvasId - DOM id of the canvas
+     * @param {Object[]} statusRecords - StatusData records for RSSI
+     */
+    function renderRSSIChart(canvasId, statusRecords) {
+        var thresholds = [
+            { value: C.RSSI.POOR, color: COLORS.thresholdWarning, label: "Poor (-95)" },
+            { value: C.RSSI.FAIR, color: COLORS.thresholdOk, label: "Fair (-85)" }
+        ];
+        renderChart(canvasId, statusRecords, thresholds, "RSSI (dBm)", -120, -50);
+    }
+
+    /**
+     * Core chart renderer.
+     */
+    function renderChart(canvasId, records, thresholds, yLabel, yMin, yMax) {
+        var canvas = document.getElementById(canvasId);
+        if (!canvas) { return; }
+
+        var ctx = canvas.getContext("2d");
+        var dpr = window.devicePixelRatio || 1;
+        var rect = canvas.parentElement.getBoundingClientRect();
+        var w = rect.width || 400;
+        var h = 200;
+
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width = w + "px";
+        canvas.style.height = h + "px";
+        ctx.scale(dpr, dpr);
+
+        var plotW = w - PADDING.left - PADDING.right;
+        var plotH = h - PADDING.top - PADDING.bottom;
+
+        // Clear
+        ctx.clearRect(0, 0, w, h);
+
+        // No data
+        if (!records || records.length === 0) {
+            ctx.fillStyle = C.Severity ? "#9e9e9e" : "#999";
+            ctx.font = "13px -apple-system, BlinkMacSystemFont, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("No data available", w / 2, h / 2);
+            return;
+        }
+
+        // Sort by date
+        var sorted = records.slice().sort(function (a, b) {
+            return new Date(a.dateTime) - new Date(b.dateTime);
+        });
+
+        var tMin = new Date(sorted[0].dateTime).getTime();
+        var tMax = new Date(sorted[sorted.length - 1].dateTime).getTime();
+        if (tMin === tMax) { tMax = tMin + 1; }
+
+        // Scale functions
+        function xScale(t) {
+            return PADDING.left + ((t - tMin) / (tMax - tMin)) * plotW;
+        }
+        function yScale(v) {
+            return PADDING.top + plotH - ((v - yMin) / (yMax - yMin)) * plotH;
+        }
+
+        // Grid lines (horizontal)
+        ctx.strokeStyle = COLORS.grid;
+        ctx.lineWidth = 0.5;
+        var ySteps = 5;
+        var yStep = (yMax - yMin) / ySteps;
+        for (var yi = 0; yi <= ySteps; yi++) {
+            var yv = yMin + yi * yStep;
+            var yy = yScale(yv);
+            ctx.beginPath();
+            ctx.moveTo(PADDING.left, yy);
+            ctx.lineTo(PADDING.left + plotW, yy);
+            ctx.stroke();
+
+            // Y-axis labels
+            ctx.fillStyle = COLORS.text;
+            ctx.font = "10px -apple-system, BlinkMacSystemFont, sans-serif";
+            ctx.textAlign = "right";
+            ctx.fillText(yv.toFixed(0), PADDING.left - 6, yy + 3);
+        }
+
+        // Threshold lines
+        thresholds.forEach(function (t) {
+            if (t.value >= yMin && t.value <= yMax) {
+                var ty = yScale(t.value);
+                ctx.strokeStyle = t.color;
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([5, 3]);
+                ctx.beginPath();
+                ctx.moveTo(PADDING.left, ty);
+                ctx.lineTo(PADDING.left + plotW, ty);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Label
+                ctx.fillStyle = t.color;
+                ctx.font = "9px -apple-system, BlinkMacSystemFont, sans-serif";
+                ctx.textAlign = "left";
+                ctx.fillText(t.label, PADDING.left + plotW + 2, ty + 3);
+            }
+        });
+
+        // Data line
+        ctx.strokeStyle = COLORS.line;
+        ctx.lineWidth = 1.5;
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        sorted.forEach(function (rec, i) {
+            var x = xScale(new Date(rec.dateTime).getTime());
+            var y = yScale(rec.data);
+            if (i === 0) { ctx.moveTo(x, y); }
+            else { ctx.lineTo(x, y); }
+        });
+        ctx.stroke();
+
+        // Data points (only if < 100 points)
+        if (sorted.length < 100) {
+            ctx.fillStyle = COLORS.point;
+            sorted.forEach(function (rec) {
+                var x = xScale(new Date(rec.dateTime).getTime());
+                var y = yScale(rec.data);
+                ctx.beginPath();
+                ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        // X-axis date labels (5 evenly spaced)
+        ctx.fillStyle = COLORS.text;
+        ctx.font = "10px -apple-system, BlinkMacSystemFont, sans-serif";
+        ctx.textAlign = "center";
+        var xSteps = Math.min(5, sorted.length);
+        for (var xi = 0; xi < xSteps; xi++) {
+            var ratio = xi / (xSteps - 1 || 1);
+            var tVal = tMin + ratio * (tMax - tMin);
+            var dt = new Date(tVal);
+            var label = (dt.getMonth() + 1) + "/" + dt.getDate();
+            var xPos = xScale(tVal);
+            ctx.fillText(label, xPos, h - PADDING.bottom + 16);
+        }
+
+        // Y-axis title
+        ctx.save();
+        ctx.translate(12, PADDING.top + plotH / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = COLORS.text;
+        ctx.font = "11px -apple-system, BlinkMacSystemFont, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(yLabel, 0, 0);
+        ctx.restore();
+    }
+
+    return {
+        renderVoltageChart: renderVoltageChart,
+        renderRSSIChart: renderRSSIChart
+    };
+})();
+
+</script>
+    <script>
+/**
+ * fleetDashboard.js — Scorecard-style fleet dashboard with KPI cards,
+ * health distribution donut, top/bottom devices, and per-category score table.
+ */
+var DHD = DHD || {};
+
+DHD.FleetDashboard = (function () {
+    "use strict";
+
+    var C = DHD.Constants;
+    var _classifications = [];
+    var _searchText = "";
+    var _sortCol = "score";
+    var _sortAsc = false;
+    var _onDeviceClick = null;
+    var _eventsBound = false;
+
+    // ── Health status levels (maps to severity system) ──────────────
+
+    var HEALTH_LEVELS = [
+        { key: "healthy",  label: "Healthy",  severity: C.Severity.HEALTHY,  color: "#4caf50", bg: "#e8f5e9" },
+        { key: "info",     label: "Info",     severity: C.Severity.INFO,     color: "#0288d1", bg: "#e1f5fe" },
+        { key: "warning",  label: "Warning",  severity: C.Severity.WARNING,  color: "#ff9800", bg: "#fff3e0" },
+        { key: "critical", label: "Critical", severity: C.Severity.CRITICAL, color: "#f44336", bg: "#ffebee" }
+    ];
+
+    // Issue categories shown as table columns
+    var CATEGORY_COLS = [
+        { key: "power",        label: "Power",    categories: [C.Category.POWER] },
+        { key: "gps",          label: "GPS",      categories: [C.Category.GPS] },
+        { key: "cellular",     label: "Cellular", categories: [C.Category.CELLULAR, C.Category.OFFLINE] },
+        { key: "installation", label: "Install",  categories: [C.Category.INSTALLATION] },
+        { key: "hardware",     label: "Hardware", categories: [C.Category.HARDWARE, C.Category.UNPLUGGED] }
+    ];
+
+    function getHealthLevel(severity) {
+        for (var i = 0; i < HEALTH_LEVELS.length; i++) {
+            if (HEALTH_LEVELS[i].severity === severity) {
+                return HEALTH_LEVELS[i];
+            }
+        }
+        return HEALTH_LEVELS[0]; // default healthy
+    }
+
+    function getScoreColor(score) {
+        if (score >= 80) { return "#4caf50"; }
+        if (score >= 60) { return "#ff9800"; }
+        if (score >= 40) { return "#f57c00"; }
+        return "#f44336";
+    }
+
+    // ── Entry point ─────────────────────────────────────────────────
+
+    function render(classifications, onDeviceClick) {
+        _classifications = classifications;
+        _onDeviceClick = onDeviceClick;
+        _searchText = "";
+
+        var metrics = computeFleetMetrics();
+        renderKPICards(metrics);
+        renderHealthDistribution(metrics);
+        renderTopIssues();
+        renderNeedAttention();
+        renderTableHeader();
+        renderTable();
+        bindEvents();
+    }
+
+    // ── Compute fleet metrics ───────────────────────────────────────
+
+    function computeFleetMetrics() {
+        var total = _classifications.length;
+        var totalScore = 0;
+        var healthyCount = 0;
+        var issueCount = 0;
+        var offlineCount = 0;
+        var statusCounts = { healthy: 0, info: 0, warning: 0, critical: 0 };
+
+        _classifications.forEach(function (item) {
+            var cls = item.classification;
+            totalScore += cls.healthScore;
+
+            // Count by severity
+            var level = getHealthLevel(cls.severity);
+            statusCounts[level.key]++;
+
+            if (cls.severity === C.Severity.HEALTHY) {
+                healthyCount++;
+            } else {
+                issueCount++;
+            }
+
+            // Count offline devices
+            if (cls.issues.some(function (issue) { return issue.category === C.Category.OFFLINE; })) {
+                offlineCount++;
+            }
+        });
+
+        return {
+            fleetScore: total > 0 ? (totalScore / total) : 0,
+            totalDevices: total,
+            healthyCount: healthyCount,
+            issueCount: issueCount,
+            offlineCount: offlineCount,
+            statusCounts: statusCounts
+        };
+    }
+
+    // ── KPI Cards ───────────────────────────────────────────────────
+
+    function renderKPICards(metrics) {
+        var container = document.getElementById("dhdKpiRow");
+        if (!container) { return; }
+
+        var cards = [
+            { value: metrics.fleetScore.toFixed(1), label: "Fleet Health", accent: "dhd-kpi-card--success" },
+            { value: formatNum(metrics.totalDevices), label: "Total Devices", accent: "" },
+            { value: formatNum(metrics.healthyCount), label: "Healthy", accent: "dhd-kpi-card--success" },
+            { value: formatNum(metrics.issueCount), label: "Issues Detected", accent: metrics.issueCount > 0 ? "dhd-kpi-card--error" : "" }
+        ];
+
+        var accentColors = { "dhd-kpi-card--success": "#2e7d32", "dhd-kpi-card--error": "#d32f2f", "": "#1976d2" };
+        var html = '<div style="display:flex;gap:16px;margin-bottom:24px;">';
+        cards.forEach(function (c) {
+            var topColor = accentColors[c.accent] || "#1976d2";
+            html += '<div style="flex:1;min-width:0;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px 12px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.12);border-top:4px solid ' + topColor + ';">' +
+                '<div style="font-size:36px;font-weight:700;line-height:1.1;margin-bottom:4px;">' + c.value + '</div>' +
+                '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:#616161;">' + c.label + '</div>' +
+                '</div>';
+        });
+        html += '</div>';
+
+        container.innerHTML = html;
+    }
+
+    // ── Donut Chart ─────────────────────────────────────────────────
+
+    function renderHealthDistribution(metrics) {
+        var canvas = document.getElementById("dhdDonutChart");
+        var centerEl = document.getElementById("dhdDonutCenter");
+        var legendEl = document.getElementById("dhdDonutLegend");
+        if (!canvas || !canvas.getContext) { return; }
+
+        var ctx = canvas.getContext("2d");
+        var dpr = window.devicePixelRatio || 1;
+        var size = 180;
+        canvas.width = size * dpr;
+        canvas.height = size * dpr;
+        canvas.style.width = size + "px";
+        canvas.style.height = size + "px";
+        ctx.scale(dpr, dpr);
+
+        var cx = size / 2;
+        var cy = size / 2;
+        var outerR = 80;
+        var innerR = 55;
+        var total = metrics.totalDevices || 1;
+
+        var segments = [];
+        HEALTH_LEVELS.forEach(function (level) {
+            var count = metrics.statusCounts[level.key] || 0;
+            if (count > 0) {
+                segments.push({ label: level.label, count: count, color: level.color });
+            }
+        });
+
+        if (segments.length === 0) {
+            segments.push({ label: "No Data", count: 1, color: "#e0e0e0" });
+        }
+
+        // Draw arcs
+        var startAngle = -Math.PI / 2;
+        segments.forEach(function (seg) {
+            var sweep = (seg.count / total) * 2 * Math.PI;
+            var endAngle = startAngle + sweep;
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, outerR, startAngle, endAngle);
+            ctx.arc(cx, cy, innerR, endAngle, startAngle, true);
+            ctx.closePath();
+            ctx.fillStyle = seg.color;
+            ctx.fill();
+
+            startAngle = endAngle;
+        });
+
+        // Center text
+        if (centerEl) {
+            centerEl.innerHTML = '<span style="font-size:28px;font-weight:700;line-height:1.1;display:block;">' + formatNum(metrics.totalDevices) + '</span>' +
+                '<span style="font-size:11px;color:#616161;text-transform:uppercase;letter-spacing:0.5px;">Devices</span>';
+        }
+
+        // Legend
+        if (legendEl) {
+            var lhtml = "";
+            HEALTH_LEVELS.forEach(function (level) {
+                var count = metrics.statusCounts[level.key] || 0;
+                lhtml += '<span style="display:inline-block;margin:0 8px 4px 0;font-size:11px;color:#616161;white-space:nowrap;">' +
+                    '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + level.color + ';vertical-align:middle;margin-right:4px;"></span>' +
+                    level.label + ' (' + count + ')' +
+                    '</span>';
+            });
+            legendEl.innerHTML = lhtml;
+        }
+    }
+
+    // ── Top Issues ──────────────────────────────────────────────────
+
+    function renderTopIssues() {
+        var container = document.getElementById("dhdTopIssues");
+        if (!container) { return; }
+
+        // Aggregate issues by label across all devices
+        var issueCounts = {};
+        var issueSeverity = {};
+        _classifications.forEach(function (item) {
+            item.classification.issues.forEach(function (issue) {
+                var lbl = issue.label || "Unknown";
+                issueCounts[lbl] = (issueCounts[lbl] || 0) + 1;
+                // Keep the worst severity seen for this issue type
+                if (!issueSeverity[lbl] || severityRank(issue.severity) < severityRank(issueSeverity[lbl])) {
+                    issueSeverity[lbl] = issue.severity;
+                }
+            });
+        });
+
+        // Sort by count descending, take top 5
+        var sorted = Object.keys(issueCounts).map(function (lbl) {
+            return { label: lbl, count: issueCounts[lbl], severity: issueSeverity[lbl] };
+        }).sort(function (a, b) {
+            return b.count - a.count;
+        }).slice(0, 5);
+
+        if (sorted.length === 0) {
+            container.innerHTML = '<div class="dhd-empty-state">No issues detected</div>';
+            return;
+        }
+
+        var maxCount = sorted[0].count;
+        var severityColors = {};
+        severityColors[C.Severity.CRITICAL] = "#f44336";
+        severityColors[C.Severity.WARNING] = "#ff9800";
+        severityColors[C.Severity.INFO] = "#0288d1";
+        severityColors[C.Severity.HEALTHY] = "#4caf50";
+
+        var html = '<table style="width:100%;border-collapse:collapse;">';
+        sorted.forEach(function (item) {
+            var color = severityColors[item.severity] || "#9e9e9e";
+            var barPct = Math.round((item.count / maxCount) * 100);
+            html += '<tr style="border-bottom:1px solid #e0e0e0;">' +
+                '<td style="width:12px;padding:8px 4px 8px 0;vertical-align:middle;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + color + ';"></span></td>' +
+                '<td style="padding:8px 4px;font-size:13px;font-weight:500;vertical-align:middle;">' + escHtml(item.label) + '</td>' +
+                '<td style="width:30px;padding:8px 4px;font-size:13px;font-weight:700;text-align:right;vertical-align:middle;">' + item.count + '</td>' +
+                '<td style="width:50px;padding:8px 4px;font-size:11px;color:#9e9e9e;vertical-align:middle;">devices</td>' +
+                '<td style="width:60px;padding:8px 0;vertical-align:middle;"><div style="width:100%;height:6px;background:#f5f5f5;border-radius:3px;overflow:hidden;"><div style="width:' + barPct + '%;height:100%;background:' + color + ';border-radius:3px;"></div></div></td>' +
+                '</tr>';
+        });
+        html += '</table>';
+
+        container.innerHTML = html;
+    }
+
+    // ── Devices Needing Attention ────────────────────────────────────
+
+    function renderNeedAttention() {
+        var container = document.getElementById("dhdNeedAttention");
+        if (!container) { return; }
+
+        // Filter to devices that have issues, sort by health score ascending
+        var withIssues = _classifications.filter(function (item) {
+            return item.classification.severity !== C.Severity.HEALTHY;
+        }).sort(function (a, b) {
+            return a.classification.healthScore - b.classification.healthScore;
+        }).slice(0, 5);
+
+        if (withIssues.length === 0) {
+            container.innerHTML = '<div class="dhd-empty-state">All devices healthy</div>';
+            return;
+        }
+
+        var html = '<table style="width:100%;border-collapse:collapse;">';
+        withIssues.forEach(function (item, i) {
+            var score = item.classification.healthScore;
+            var color = getScoreColor(score);
+            html += '<tr data-device-id="' + item.device.id + '" style="cursor:pointer;border-bottom:1px solid #e0e0e0;">' +
+                '<td style="width:24px;padding:8px 4px 8px 0;font-size:13px;font-weight:700;color:#9e9e9e;vertical-align:middle;">' + (i + 1) + '.</td>' +
+                '<td style="padding:8px 4px;font-size:13px;color:#1976d2;font-weight:500;vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escHtml(item.device.name) + '</td>' +
+                '<td style="width:40px;padding:8px 0 8px 4px;font-size:14px;font-weight:700;text-align:right;color:' + color + ';vertical-align:middle;">' + score + '</td>' +
+                '</tr>';
+        });
+        html += '</table>';
+
+        container.innerHTML = html;
+    }
+
+    // ── Table Header ────────────────────────────────────────────────
+
+    function renderTableHeader() {
+        var countEl = document.getElementById("dhdTableCount");
+        if (countEl) {
+            var filtered = getFilteredData();
+            countEl.textContent = "All Devices (" + filtered.length + ")";
+        }
+    }
+
+    // ── Table ───────────────────────────────────────────────────────
+
+    function renderTable() {
+        var tbody = document.getElementById("dhdTableBody");
+        if (!tbody) { return; }
+
+        var filtered = getFilteredData();
+        filtered = sortData(filtered);
+
+        // Update count
+        var countEl = document.getElementById("dhdTableCount");
+        if (countEl) {
+            countEl.textContent = "All Devices (" + filtered.length + ")";
+        }
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="dhd-empty">No devices match the current filters.</td></tr>';
+            return;
+        }
+
+        var html = "";
+        filtered.forEach(function (item) {
+            var cls = item.classification;
+            var device = item.device;
+            var score = cls.healthScore;
+            var level = getHealthLevel(cls.severity);
+
+            // Compute per-category scores
+            var catScores = computeCategoryScores(cls);
+
+            html += '<tr class="dhd-table__row" data-device-id="' + device.id + '">';
+
+            // Name
+            html += '<td class="dhd-table__cell">' + escHtml(device.name) + '</td>';
+
+            // Health Score
+            html += '<td class="dhd-table__cell">' + renderScoreBar(score) + '</td>';
+
+            // Status badge
+            html += '<td class="dhd-table__cell"><span class="dhd-badge dhd-status-badge--' + level.key + '">' + level.label + '</span></td>';
+
+            // Category columns
+            CATEGORY_COLS.forEach(function (col) {
+                var cs = catScores[col.key];
+                html += '<td class="dhd-table__cell">' + renderScoreBar(cs.score, cs.count) + '</td>';
+            });
+
+            html += '</tr>';
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    function computeCategoryScores(classification) {
+        var scores = {};
+        CATEGORY_COLS.forEach(function (col) {
+            var count = 0;
+            var deduction = 0;
+            classification.issues.forEach(function (issue) {
+                if (col.categories.indexOf(issue.category) !== -1) {
+                    count++;
+                    deduction += (C.ScoreDeductions[issue.severity] || 0);
+                }
+            });
+            scores[col.key] = {
+                score: Math.max(0, 100 - deduction),
+                count: count
+            };
+        });
+        return scores;
+    }
+
+    function renderScoreBar(score, eventCount) {
+        var color = getScoreColor(score);
+        var countStr = typeof eventCount === "number" ? ' <span style="color:#9e9e9e">(' + eventCount + ')</span>' : '';
+        return '<table style="width:100%;min-width:100px;border-collapse:collapse;"><tr>' +
+            '<td style="padding:0 6px 0 0;vertical-align:middle;"><div style="height:8px;background:#f5f5f5;border-radius:4px;overflow:hidden;min-width:40px;"><div style="width:' + score + '%;height:100%;background:' + color + ';border-radius:4px;"></div></div></td>' +
+            '<td style="padding:0;width:60px;font-size:12px;font-weight:600;white-space:nowrap;color:' + color + ';vertical-align:middle;">' + score + countStr + '</td>' +
+            '</tr></table>';
+    }
+
+    // ── Filtering ───────────────────────────────────────────────────
+
+    function getFilteredData() {
+        var data = _classifications;
+
+        if (_searchText) {
+            var terms = _searchText.toLowerCase().trim().split(/\s+/).filter(function (t) { return t.length > 0; });
+            if (terms.length > 0) {
+                data = data.filter(function (item) {
+                    var searchable = buildSearchString(item);
+                    return terms.every(function (term) {
+                        return searchable.indexOf(term) !== -1;
+                    });
+                });
+            }
+        }
+
+        return data;
+    }
+
+    function buildSearchString(item) {
+        var device = item.device;
+        var cls = item.classification;
+        var level = getHealthLevel(cls.severity);
+        var parts = [
+            device.name || "",
+            device.serialNumber || "",
+            device.vehicleIdentificationNumber || "",
+            device.comment || "",
+            device.licensePlate || "",
+            device.productId ? "GO" + device.productId : "",
+            device.deviceType || "",
+            level.label || "",
+            cls.severity || "",
+            cls.primaryIssue || ""
+        ];
+
+        if (device.groups && device.groups.length > 0) {
+            device.groups.forEach(function (g) {
+                parts.push(DHD.DeviceCache.getGroupName(g.id));
+            });
+        }
+
+        if (cls.issues) {
+            cls.issues.forEach(function (issue) {
+                parts.push(issue.label || "");
+                parts.push(issue.category || "");
+            });
+        }
+
+        return parts.join(" ").toLowerCase();
+    }
+
+    // ── Sorting ─────────────────────────────────────────────────────
+
+    function severityRank(s) {
+        switch (s) {
+            case C.Severity.CRITICAL: return 0;
+            case C.Severity.WARNING: return 1;
+            case C.Severity.INFO: return 2;
+            case C.Severity.HEALTHY: return 3;
+            default: return 4;
+        }
+    }
+
+    function sortData(data) {
+        var col = _sortCol;
+        var asc = _sortAsc;
+
+        data.sort(function (a, b) {
+            var va, vb;
+            switch (col) {
+                case "name":
+                    va = (a.device.name || "").toLowerCase();
+                    vb = (b.device.name || "").toLowerCase();
+                    break;
+                case "score":
+                    va = a.classification.healthScore;
+                    vb = b.classification.healthScore;
+                    break;
+                case "status":
+                    va = severityRank(a.classification.severity);
+                    vb = severityRank(b.classification.severity);
+                    break;
+                case "power":
+                case "gps":
+                case "cellular":
+                case "installation":
+                case "hardware":
+                    var aCat = computeCategoryScores(a.classification);
+                    var bCat = computeCategoryScores(b.classification);
+                    va = aCat[col].score;
+                    vb = bCat[col].score;
+                    break;
+                default:
+                    va = 0; vb = 0;
+            }
+            if (va < vb) { return asc ? -1 : 1; }
+            if (va > vb) { return asc ? 1 : -1; }
+            return 0;
+        });
+
+        return data;
+    }
+
+    // ── Events ──────────────────────────────────────────────────────
+
+    function bindEvents() {
+        if (_eventsBound) { return; }
+        _eventsBound = true;
+
+        // Table row clicks
+        var tbody = document.getElementById("dhdTableBody");
+        if (tbody) {
+            tbody.addEventListener("click", function (e) {
+                var row = e.target.closest("[data-device-id]");
+                if (row && _onDeviceClick) {
+                    _onDeviceClick(row.getAttribute("data-device-id"));
+                }
+            });
+        }
+
+        // Attention list clicks
+        var attentionEl = document.getElementById("dhdNeedAttention");
+        if (attentionEl) {
+            attentionEl.addEventListener("click", function (e) {
+                var item = e.target.closest("[data-device-id]");
+                if (item && _onDeviceClick) {
+                    _onDeviceClick(item.getAttribute("data-device-id"));
+                }
+            });
+        }
+
+        // Search
+        var searchInput = document.getElementById("dhdSearch");
+        if (searchInput) {
+            searchInput.addEventListener("input", function () {
+                _searchText = searchInput.value;
+                renderTable();
+            });
+        }
+
+        // Column sort
+        var headers = document.querySelectorAll("#dhdFleetView [data-sort]");
+        headers.forEach(function (header) {
+            header.addEventListener("click", function () {
+                var col = header.getAttribute("data-sort");
+                if (_sortCol === col) {
+                    _sortAsc = !_sortAsc;
+                } else {
+                    _sortCol = col;
+                    _sortAsc = true;
+                }
+                updateSortIndicators();
+                renderTable();
+            });
+        });
+
+        // CSV export
+        var csvBtn = document.getElementById("dhdCsvBtn");
+        if (csvBtn) {
+            csvBtn.addEventListener("click", exportCSV);
+        }
+
+        // Print
+        var printBtn = document.getElementById("dhdPrintBtn");
+        if (printBtn) {
+            printBtn.addEventListener("click", function () {
+                window.print();
+            });
+        }
+    }
+
+    function updateSortIndicators() {
+        var headers = document.querySelectorAll("#dhdFleetView [data-sort]");
+        headers.forEach(function (h) {
+            h.classList.remove("dhd-sort--asc", "dhd-sort--desc");
+            if (h.getAttribute("data-sort") === _sortCol) {
+                h.classList.add(_sortAsc ? "dhd-sort--asc" : "dhd-sort--desc");
+            }
+        });
+    }
+
+    // ── CSV Export ───────────────────────────────────────────────────
+
+    function exportCSV() {
+        var filtered = getFilteredData();
+        filtered = sortData(filtered);
+
+        var headers = ["Device Name", "Health Score", "Status", "Power", "GPS", "Cellular", "Installation", "Hardware"];
+        var rows = [headers.join(",")];
+
+        filtered.forEach(function (item) {
+            var cls = item.classification;
+            var catScores = computeCategoryScores(cls);
+            var level = getHealthLevel(cls.severity);
+
+            var row = [
+                '"' + (item.device.name || "").replace(/"/g, '""') + '"',
+                cls.healthScore,
+                '"' + level.label + '"',
+                catScores.power.score + " (" + catScores.power.count + ")",
+                catScores.gps.score + " (" + catScores.gps.count + ")",
+                catScores.cellular.score + " (" + catScores.cellular.count + ")",
+                catScores.installation.score + " (" + catScores.installation.count + ")",
+                catScores.hardware.score + " (" + catScores.hardware.count + ")"
+            ];
+            rows.push(row.join(","));
+        });
+
+        var csv = rows.join("\n");
+        var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "device-health-scorecard.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // ── Utilities ───────────────────────────────────────────────────
+
+    function escHtml(str) {
+        var div = document.createElement("div");
+        div.appendChild(document.createTextNode(str || ""));
+        return div.innerHTML;
+    }
+
+    function formatNum(n) {
+        if (n == null) { return "0"; }
+        return n.toLocaleString ? n.toLocaleString() : String(n);
+    }
+
+    return {
+        render: render
+    };
+})();
+
+</script>
+    <script>
+/**
+ * deviceDiagnostics.js — Single-device drill-down panel.
+ * Shows health score, root causes, charts, fault history, device info.
+ */
+var DHD = DHD || {};
+
+DHD.DeviceDiagnostics = (function () {
+    "use strict";
+
+    var C = DHD.Constants;
+
+    /**
+     * Render the drill-down view for a single device.
+     * @param {Object} device - Device from cache
+     * @param {Object} statusInfo - DeviceStatusInfo
+     * @param {Object} analysis - result from rootCauseEngine.analyzeDevice()
+     * @param {Object} drillData - raw drill-down data (statusData, faults)
+     * @param {Function} onBack - callback to return to fleet view
+     */
+    function render(device, statusInfo, analysis, drillData, onBack) {
+        renderHeader(device, onBack);
+        renderHealthScore(analysis.healthScore);
+        renderActiveIssues(analysis.issues);
+        renderRootCauses(analysis.rootCauses);
+        renderCharts(drillData.statusData);
+        renderFaultHistory(drillData.faults);
+        renderDeviceInfo(device, statusInfo);
+    }
+
+    // ── Header ─────────────────────────────────────────────────────────
+
+    function renderHeader(device, onBack) {
+        var el = document.getElementById("dhdDrillHeader");
+        if (!el) { return; }
+
+        el.innerHTML =
+            '<button class="dhd-btn dhd-btn--back" id="dhdBackBtn">&larr; Back to Fleet</button>' +
+            '<div class="dhd-drill-title">' +
+                '<h2>' + escHtml(device.name) + '</h2>' +
+                '<span class="dhd-drill-serial">S/N: ' + escHtml(device.serialNumber || "N/A") +
+                ' &middot; Firmware: ' + escHtml(formatFirmware(device)) + '</span>' +
+            '</div>';
+
+        document.getElementById("dhdBackBtn").addEventListener("click", function () {
+            if (onBack) { onBack(); }
+        });
+    }
+
+    // ── Health Score ───────────────────────────────────────────────────
+
+    function renderHealthScore(score) {
+        var el = document.getElementById("dhdHealthScore");
+        if (!el) { return; }
+
+        var colorClass = "dhd-score--healthy";
+        if (score < 40) { colorClass = "dhd-score--critical"; }
+        else if (score < 70) { colorClass = "dhd-score--warning"; }
+
+        el.innerHTML =
+            '<div class="dhd-score ' + colorClass + '">' +
+                '<div class="dhd-score__value">' + score + '</div>' +
+                '<div class="dhd-score__label">Health Score</div>' +
+            '</div>';
+    }
+
+    // ── Active Issues ──────────────────────────────────────────────────
+
+    function renderActiveIssues(issues) {
+        var el = document.getElementById("dhdActiveIssues");
+        if (!el) { return; }
+
+        if (issues.length === 0) {
+            el.innerHTML = '<div class="dhd-badge dhd-severity--healthy">No Active Issues</div>';
+            return;
+        }
+
+        var html = "";
+        issues.forEach(function (issue) {
+            html += '<span class="dhd-badge dhd-severity--' + issue.severity + '">' +
+                escHtml(issue.label) + '</span> ';
+        });
+        el.innerHTML = html;
+    }
+
+    // ── Root Cause Analysis ────────────────────────────────────────────
+
+    function renderRootCauses(rootCauses) {
+        var el = document.getElementById("dhdRootCauses");
+        if (!el) { return; }
+
+        if (rootCauses.length === 0) {
+            el.innerHTML = '<div class="dhd-empty-state">No issues detected. This device appears healthy.</div>';
+            return;
+        }
+
+        var html = "";
+        rootCauses.forEach(function (rc) {
+            html += '<div class="dhd-root-cause dhd-root-cause--' + rc.severity + '">' +
+                '<div class="dhd-root-cause__header">' +
+                    '<span class="dhd-root-cause__rank">#' + rc.rank + '</span>' +
+                    '<span class="dhd-root-cause__category">' + capitalize(rc.category) + '</span>' +
+                    '<span class="dhd-root-cause__confidence">' + rc.confidence + '% confidence</span>' +
+                    '<span class="dhd-badge dhd-severity--' + rc.severity + '">' + capitalize(rc.severity) + '</span>' +
+                '</div>' +
+                '<div class="dhd-root-cause__explanation">' + escHtml(rc.explanation) + '</div>' +
+                '<div class="dhd-root-cause__actions">' +
+                    '<strong>Recommended Actions:</strong><ul>';
+            rc.actions.forEach(function (action) {
+                html += '<li>' + escHtml(action) + '</li>';
+            });
+            html += '</ul></div></div>';
+        });
+
+        el.innerHTML = html;
+    }
+
+    // ── Charts ─────────────────────────────────────────────────────────
+
+    function renderCharts(statusData) {
+        // Slight delay so canvas elements are in the DOM
+        setTimeout(function () {
+            DHD.DiagnosticTimeline.renderVoltageChart("dhdVoltageChart",
+                statusData[C.Diagnostics.VOLTAGE]);
+            DHD.DiagnosticTimeline.renderRSSIChart("dhdRSSIChart",
+                statusData[C.Diagnostics.CELLULAR_RSSI]);
+        }, 50);
+    }
+
+    // ── Fault History ──────────────────────────────────────────────────
+
+    function renderFaultHistory(faults) {
+        var el = document.getElementById("dhdFaultHistory");
+        if (!el) { return; }
+
+        if (!faults || faults.length === 0) {
+            el.innerHTML = '<div class="dhd-empty-state">No faults recorded in the last 30 days.</div>';
+            return;
+        }
+
+        // Sort by date descending, take last 50
+        var sorted = faults.slice().sort(function (a, b) {
+            return new Date(b.dateTime) - new Date(a.dateTime);
+        }).slice(0, 50);
+
+        var html = '<table class="dhd-table dhd-table--faults">' +
+            '<thead><tr>' +
+            '<th>Date</th><th>Code</th><th>Description</th><th>Severity</th><th>State</th>' +
+            '</tr></thead><tbody>';
+
+        sorted.forEach(function (f) {
+            var dt = f.dateTime ? formatDate(f.dateTime) : "N/A";
+            var code = f.diagnostic ? (f.diagnostic.id || "—") : "—";
+            var desc = f.diagnostic ? (f.diagnostic.name || code) : "—";
+            var sev = classifyFaultSeverity(f);
+            var state = f.failureModeState === 1 ? "Active" : "Inactive";
+
+            html += '<tr>' +
+                '<td>' + dt + '</td>' +
+                '<td>' + escHtml(String(code)) + '</td>' +
+                '<td>' + escHtml(desc) + '</td>' +
+                '<td><span class="dhd-badge dhd-severity--' + sev + '">' + capitalize(sev) + '</span></td>' +
+                '<td>' + state + '</td>' +
+                '</tr>';
+        });
+
+        html += '</tbody></table>';
+        el.innerHTML = html;
+    }
+
+    // ── Device Info ────────────────────────────────────────────────────
+
+    function renderDeviceInfo(device, statusInfo) {
+        var el = document.getElementById("dhdDeviceInfo");
+        if (!el) { return; }
+
+        var fwPending = device.parameterVersion != null && device.parameterVersionOnDevice != null &&
+                        device.parameterVersion !== device.parameterVersionOnDevice;
+
+        var html = '<div class="dhd-info-grid">' +
+            infoItem("Serial Number", device.serialNumber || "N/A") +
+            infoItem("Product", device.productId ? "GO" + device.productId : "N/A") +
+            infoItem("Firmware", formatFirmware(device)) +
+            infoItem("Config Version", (device.parameterVersion || "N/A") +
+                (fwPending ? ' <span class="dhd-badge dhd-severity--info">Update Pending</span>' : "")) +
+            infoItem("On-Device Config", device.parameterVersionOnDevice || "N/A") +
+            infoItem("Communicating", statusInfo.isDeviceCommunicating ? "Yes" : "No") +
+            infoItem("Last Communication", statusInfo.dateTime ? formatDate(statusInfo.dateTime) : "N/A") +
+            infoItem("Position", statusInfo.latitude != null ?
+                statusInfo.latitude.toFixed(4) + ", " + statusInfo.longitude.toFixed(4) : "N/A") +
+            '</div>';
+
+        el.innerHTML = html;
+    }
+
+    // ── Utilities ──────────────────────────────────────────────────────
+
+    function infoItem(label, value) {
+        return '<div class="dhd-info-item"><span class="dhd-info-item__label">' +
+            escHtml(label) + '</span><span class="dhd-info-item__value">' + value + '</span></div>';
+    }
+
+    function classifyFaultSeverity(fault) {
+        if (!fault.diagnostic) { return C.Severity.INFO; }
+        var id = parseInt(fault.diagnostic.id, 10);
+        if (C.HARDWARE_FAULT_CODES.indexOf(id) !== -1) { return C.Severity.CRITICAL; }
+        if (id === 135 || id === 287) { return C.Severity.WARNING; }
+        return C.Severity.INFO;
+    }
+
+    function formatFirmware(device) {
+        if (device.majorVersion != null) {
+            return device.majorVersion + "." + (device.minorVersion || 0);
+        }
+        return "N/A";
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) { return "N/A"; }
+        var d = new Date(dateStr);
+        return (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear() + " " +
+            pad(d.getHours()) + ":" + pad(d.getMinutes());
+    }
+
+    function pad(n) { return n < 10 ? "0" + n : String(n); }
+
+    function escHtml(str) {
+        var div = document.createElement("div");
+        div.appendChild(document.createTextNode(str || ""));
+        return div.innerHTML;
+    }
+
+    function capitalize(s) {
+        return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
+    }
+
+    return {
+        render: render
+    };
+})();
+
+</script>
+    <script>
+/**
+ * main.js — MyGeotab add-in lifecycle host.
+ * Coordinates initialization, view switching, and data flow.
+ * In standalone mode (no geotab global), uses mock data for UI preview.
+ */
+var DHD = DHD || {};
+
+// Provide geotab stub when running standalone (preview mode)
+if (typeof geotab === "undefined") {
+    var geotab = { addin: {} };
+}
+
+geotab.addin.device_health_diagnostics = function () {
+    "use strict";
+
+    var C = DHD.Constants;
+    var _api, _page;
+    var _fleetData = null;      // cached fleet health
+    var _classifications = [];  // classified fleet data
+    var _statusInfoMap = {};    // deviceId → statusInfo
+
+    // ── View toggling ──────────────────────────────────────────────────
+
+    function showFleetView() {
+        var fleet = document.getElementById("dhdFleetView");
+        var drill = document.getElementById("dhdDrillView");
+        if (fleet) { fleet.style.display = "block"; fleet.classList.add("dhd-view--active"); }
+        if (drill) { drill.style.display = "none"; drill.classList.remove("dhd-view--active"); }
+    }
+
+    function showDrillView() {
+        var fleet = document.getElementById("dhdFleetView");
+        var drill = document.getElementById("dhdDrillView");
+        if (fleet) { fleet.style.display = "none"; fleet.classList.remove("dhd-view--active"); }
+        if (drill) { drill.style.display = "block"; drill.classList.add("dhd-view--active"); }
+    }
+
+    // ── Loading / Error states ─────────────────────────────────────────
+
+    function showLoading(message) {
+        var el = document.getElementById("dhdLoading");
+        if (el) {
+            el.textContent = message || "Loading\u2026";
+            el.style.display = "flex";
+        }
+        var err = document.getElementById("dhdError");
+        if (err) { err.style.display = "none"; }
+    }
+
+    function hideLoading() {
+        var el = document.getElementById("dhdLoading");
+        if (el) { el.style.display = "none"; }
+    }
+
+    function showError(message) {
+        hideLoading();
+        var el = document.getElementById("dhdError");
+        if (el) {
+            el.textContent = message;
+            el.style.display = "block";
+        }
+    }
+
+    // ── Fleet data load & classify ─────────────────────────────────────
+
+    function loadFleetData() {
+        showLoading("Loading fleet health data\u2026");
+
+        DHD.DeviceCache.load(_api)
+            .then(function () {
+                return DHD.HealthService.fetchFleetHealth(_api);
+            })
+            .then(function (data) {
+                _fleetData = data;
+                classifyFleet();
+                hideLoading();
+                DHD.FleetDashboard.render(_classifications, onDeviceClick);
+            })
+            .catch(function (err) {
+                showError("Failed to load fleet data: " + (err.message || err));
+                console.error("DHD fleet load error:", err);
+            });
+    }
+
+    function classifyFleet() {
+        _classifications = [];
+        _statusInfoMap = {};
+
+        var devices = DHD.DeviceCache.getAllDevices();
+        var siMap = {};
+
+        // Index statusInfos by device id
+        _fleetData.statusInfos.forEach(function (si) {
+            if (si.device && si.device.id) {
+                siMap[si.device.id] = si;
+            }
+        });
+
+        devices.forEach(function (device) {
+            var si = siMap[device.id];
+            if (!si) { return; } // no status info — skip
+
+            _statusInfoMap[device.id] = si;
+
+            var faults = _fleetData.faultsByDevice[device.id] || [];
+            var classification = DHD.RootCauseEngine.classifyDevice(si, faults, device);
+
+            _classifications.push({
+                device: device,
+                statusInfo: si,
+                classification: classification
+            });
+        });
+    }
+
+    // ── Device drill-down ──────────────────────────────────────────────
+
+    function onDeviceClick(deviceId) {
+        var device = DHD.DeviceCache.getDevice(deviceId);
+        var statusInfo = _statusInfoMap[deviceId];
+        if (!device || !statusInfo) { return; }
+
+        showDrillView();
+        showLoading("Loading device diagnostics\u2026");
+
+        DHD.HealthService.fetchDeviceDrillDown(_api, deviceId)
+            .then(function (drillData) {
+                var analysis = DHD.RootCauseEngine.analyzeDevice(device, statusInfo, drillData);
+                hideLoading();
+                DHD.DeviceDiagnostics.render(device, statusInfo, analysis, drillData, function () {
+                    showFleetView();
+                });
+            })
+            .catch(function (err) {
+                showError("Failed to load device diagnostics: " + (err.message || err));
+                console.error("DHD drill-down error:", err);
+            });
+    }
+
+    // ── Refresh button ─────────────────────────────────────────────────
+
+    function bindRefresh() {
+        var btn = document.getElementById("dhdRefreshBtn");
+        if (btn) {
+            btn.addEventListener("click", function () {
+                showFleetView();
+                loadFleetData();
+            });
+        }
+    }
+
+    // ── Mock data for standalone preview ────────────────────────────────
+
+    function buildMockApi() {
+        var now = new Date();
+        var hoursAgo = function (h) { return new Date(now.getTime() - h * 3600000).toISOString(); };
+
+        // 24 mock devices across various health states
+        var mockDevices = [
+            { id: "d1",  name: "Truck 101 - Toronto",     serialNumber: "G9AA11000001", deviceType: "GO9", productId: 9, groups: [{id:"g1"}] },
+            { id: "d2",  name: "Truck 102 - Oakville",    serialNumber: "G9AA11000002", deviceType: "GO9", productId: 9, groups: [{id:"g1"}] },
+            { id: "d3",  name: "Van 201 - Mississauga",   serialNumber: "G9AA11000003", deviceType: "GO9", productId: 9, groups: [{id:"g2"}] },
+            { id: "d4",  name: "Van 202 - Brampton",      serialNumber: "G9AA11000004", deviceType: "GO9", productId: 9, groups: [{id:"g2"}] },
+            { id: "d5",  name: "Sedan 301 - Hamilton",    serialNumber: "G9AA11000005", deviceType: "GO9", productId: 9, groups: [{id:"g1"}] },
+            { id: "d6",  name: "Sedan 302 - Burlington",  serialNumber: "G9AA11000006", deviceType: "GO9", productId: 9, groups: [{id:"g1"}] },
+            { id: "d7",  name: "SUV 401 - Markham",       serialNumber: "G9AA11000007", deviceType: "GO9", productId: 9, groups: [{id:"g3"}] },
+            { id: "d8",  name: "SUV 402 - Richmond Hill", serialNumber: "G9AA11000008", deviceType: "GO9", productId: 9, groups: [{id:"g3"}] },
+            { id: "d9",  name: "Truck 103 - Vaughan",     serialNumber: "G9AA11000009", deviceType: "GO9", productId: 9, groups: [{id:"g1"}] },
+            { id: "d10", name: "Van 203 - Kitchener",     serialNumber: "G9AA11000010", deviceType: "GO9", productId: 9, groups: [{id:"g2"}] },
+            { id: "d11", name: "Truck 104 - London",      serialNumber: "G9AA11000011", deviceType: "GO9", productId: 9, groups: [{id:"g1"}] },
+            { id: "d12", name: "Van 204 - Waterloo",      serialNumber: "G9AA11000012", deviceType: "GO9", productId: 9, groups: [{id:"g2"}] },
+            { id: "d13", name: "Sedan 303 - Guelph",      serialNumber: "G9AA11000013", deviceType: "GO9", productId: 9, groups: [{id:"g1"}] },
+            { id: "d14", name: "SUV 403 - Oshawa",        serialNumber: "G9AA11000014", deviceType: "GO9", productId: 9, groups: [{id:"g3"}] },
+            { id: "d15", name: "Truck 105 - Barrie",      serialNumber: "G9AA11000015", deviceType: "GO9", productId: 9, groups: [{id:"g1"}] },
+            { id: "d16", name: "Van 205 - St. Catharines", serialNumber: "G9AA11000016", deviceType: "GO9", productId: 9, groups: [{id:"g2"}] },
+            { id: "d17", name: "Sedan 304 - Niagara",     serialNumber: "G9AA11000017", deviceType: "GO9", productId: 9, groups: [{id:"g1"}] },
+            { id: "d18", name: "SUV 404 - Peterborough",  serialNumber: "G9AA11000018", deviceType: "GO9", productId: 9, groups: [{id:"g3"}] },
+            { id: "d19", name: "Truck 106 - Sudbury",     serialNumber: "G9AA11000019", deviceType: "GO9", productId: 9, groups: [{id:"g1"}] },
+            { id: "d20", name: "Van 206 - Thunder Bay",   serialNumber: "G9AA11000020", deviceType: "GO9", productId: 9, groups: [{id:"g2"}] },
+            { id: "d21", name: "Sedan 305 - Windsor",     serialNumber: "G9AA11000021", deviceType: "GO9", productId: 9, groups: [{id:"g1"}] },
+            { id: "d22", name: "SUV 405 - Kingston",      serialNumber: "G9AA11000022", deviceType: "GO9", productId: 9, groups: [{id:"g3"}] },
+            { id: "d23", name: "Truck 107 - Ottawa",      serialNumber: "G9AA11000023", deviceType: "GO9", productId: 9, groups: [{id:"g1"}] },
+            { id: "d24", name: "Van 207 - Whitby",        serialNumber: "G9AA11000024", deviceType: "GO9", productId: 9, groups: [{id:"g2"}] }
+        ];
+
+        var mockGroups = [
+            { id: "g1", name: "Trucks & Sedans" },
+            { id: "g2", name: "Vans" },
+            { id: "g3", name: "SUVs" }
+        ];
+
+        // StatusInfos — vary communicating, lastComm, lat/lng
+        var mockStatusInfos = [
+            // Healthy — communicating, recent
+            { device: {id:"d1"},  isDeviceCommunicating: true,  dateTime: hoursAgo(0.5), latitude: 43.65, longitude: -79.38 },
+            { device: {id:"d2"},  isDeviceCommunicating: true,  dateTime: hoursAgo(1),   latitude: 43.45, longitude: -79.68 },
+            { device: {id:"d5"},  isDeviceCommunicating: true,  dateTime: hoursAgo(0.2), latitude: 43.25, longitude: -79.87 },
+            { device: {id:"d6"},  isDeviceCommunicating: true,  dateTime: hoursAgo(2),   latitude: 43.32, longitude: -79.80 },
+            { device: {id:"d9"},  isDeviceCommunicating: true,  dateTime: hoursAgo(0.1), latitude: 43.80, longitude: -79.53 },
+            { device: {id:"d11"}, isDeviceCommunicating: true,  dateTime: hoursAgo(3),   latitude: 42.98, longitude: -81.24 },
+            { device: {id:"d13"}, isDeviceCommunicating: true,  dateTime: hoursAgo(1.5), latitude: 43.55, longitude: -80.25 },
+            { device: {id:"d15"}, isDeviceCommunicating: true,  dateTime: hoursAgo(0.8), latitude: 44.38, longitude: -79.69 },
+            { device: {id:"d17"}, isDeviceCommunicating: true,  dateTime: hoursAgo(4),   latitude: 43.06, longitude: -79.07 },
+            { device: {id:"d22"}, isDeviceCommunicating: true,  dateTime: hoursAgo(0.3), latitude: 44.23, longitude: -76.49 },
+            { device: {id:"d23"}, isDeviceCommunicating: true,  dateTime: hoursAgo(1.2), latitude: 45.42, longitude: -75.69 },
+            { device: {id:"d24"}, isDeviceCommunicating: true,  dateTime: hoursAgo(0.7), latitude: 43.87, longitude: -78.94 },
+            // GPS issue — communicating but lat/lng stuck at 0,0
+            { device: {id:"d3"},  isDeviceCommunicating: true,  dateTime: hoursAgo(1),   latitude: 0,     longitude: 0 },
+            { device: {id:"d14"}, isDeviceCommunicating: true,  dateTime: hoursAgo(2),   latitude: 0,     longitude: 0 },
+            // Warning — communicating, recent, but will get faults
+            { device: {id:"d4"},  isDeviceCommunicating: true,  dateTime: hoursAgo(3),   latitude: 43.73, longitude: -79.76 },
+            { device: {id:"d7"},  isDeviceCommunicating: true,  dateTime: hoursAgo(5),   latitude: 43.85, longitude: -79.33 },
+            { device: {id:"d10"}, isDeviceCommunicating: true,  dateTime: hoursAgo(2),   latitude: 43.45, longitude: -80.49 },
+            { device: {id:"d12"}, isDeviceCommunicating: true,  dateTime: hoursAgo(6),   latitude: 43.46, longitude: -80.52 },
+            { device: {id:"d16"}, isDeviceCommunicating: true,  dateTime: hoursAgo(4),   latitude: 43.16, longitude: -79.24 },
+            { device: {id:"d21"}, isDeviceCommunicating: true,  dateTime: hoursAgo(8),   latitude: 42.32, longitude: -83.04 },
+            // Offline > 24h
+            { device: {id:"d8"},  isDeviceCommunicating: false, dateTime: hoursAgo(48),  latitude: 43.88, longitude: -79.43 },
+            { device: {id:"d18"}, isDeviceCommunicating: false, dateTime: hoursAgo(36),  latitude: 44.30, longitude: -78.32 },
+            // Offline > 72h (critical)
+            { device: {id:"d19"}, isDeviceCommunicating: false, dateTime: hoursAgo(120), latitude: 46.49, longitude: -81.00 },
+            { device: {id:"d20"}, isDeviceCommunicating: false, dateTime: hoursAgo(200), latitude: 48.38, longitude: -89.25 }
+        ];
+
+        // Faults — various codes to trigger different categories
+        var mockFaults = [
+            // d4 — low battery (fault code 135)
+            { device: {id:"d4"},  diagnostic: {id:"135"}, failureMode: {id:"135"}, dateTime: hoursAgo(12) },
+            // d7 — loose install (fault code 287)
+            { device: {id:"d7"},  diagnostic: {id:"287"}, failureMode: {id:"287"}, dateTime: hoursAgo(24) },
+            // d10 — low battery
+            { device: {id:"d10"}, diagnostic: {id:"135"}, failureMode: {id:"135"}, dateTime: hoursAgo(6) },
+            // d12 — loose install
+            { device: {id:"d12"}, diagnostic: {id:"287"}, failureMode: {id:"287"}, dateTime: hoursAgo(18) },
+            // d16 — low battery + loose install
+            { device: {id:"d16"}, diagnostic: {id:"135"}, failureMode: {id:"135"}, dateTime: hoursAgo(10) },
+            { device: {id:"d16"}, diagnostic: {id:"287"}, failureMode: {id:"287"}, dateTime: hoursAgo(10) },
+            // d19 — hardware failure (fault code 128)
+            { device: {id:"d19"}, diagnostic: {id:"128"}, failureMode: {id:"128"}, dateTime: hoursAgo(96) },
+            // d20 — hardware failure + low battery
+            { device: {id:"d20"}, diagnostic: {id:"450"}, failureMode: {id:"450"}, dateTime: hoursAgo(150) },
+            { device: {id:"d20"}, diagnostic: {id:"135"}, failureMode: {id:"135"}, dateTime: hoursAgo(150) },
+            // d8 — OEM issue (fault code 488)
+            { device: {id:"d8"},  diagnostic: {id:"488"}, failureMode: {id:"488"}, dateTime: hoursAgo(30) },
+            // d21 — low battery
+            { device: {id:"d21"}, diagnostic: {id:"135"}, failureMode: {id:"135"}, dateTime: hoursAgo(5) }
+        ];
+
+        // Add firmware mismatch to a couple of devices
+        mockDevices[10].parameterVersion = 42;  // d11
+        mockDevices[10].parameterVersionOnDevice = 40;
+        mockDevices[17].parameterVersion = 38;  // d18
+        mockDevices[17].parameterVersionOnDevice = 36;
+
+        return {
+            multiCall: function (calls, success, failure) {
+                var results = calls.map(function (call) {
+                    var typeName = call[1].typeName;
+                    switch (typeName) {
+                        case "Device":       return mockDevices;
+                        case "Group":        return mockGroups;
+                        case "DeviceStatusInfo": return mockStatusInfos;
+                        case "FaultData":    return mockFaults;
+                        case "StatusData":   return [];
+                        case "LogRecord":    return [];
+                        default:             return [];
+                    }
+                });
+                setTimeout(function () { success(results); }, 50);
+            }
+        };
+    }
+
+    // ── Lifecycle ──────────────────────────────────────────────────────
+
+    return {
+        /**
+         * Called once when the add-in is first loaded.
+         */
+        initialize: function (api, page, callback) {
+            _api = api;
+            _page = page;
+
+            bindRefresh();
+            loadFleetData();
+
+            if (callback) { callback(); }
+        },
+
+        /**
+         * Called each time the user navigates to this add-in.
+         */
+        focus: function (api, page) {
+            _api = api;
+            _page = page;
+
+            var container = document.getElementById("dhdContainer");
+            if (container) { container.style.display = "block"; }
+
+            showFleetView();
+        },
+
+        /**
+         * Called when the user navigates away from this add-in.
+         */
+        blur: function () {
+            var container = document.getElementById("dhdContainer");
+            if (container) { container.style.display = "none"; }
+        },
+
+        /**
+         * Auto-initialize with mock data when running standalone.
+         */
+        _initStandalone: function () {
+            _api = buildMockApi();
+            _page = {};
+            bindRefresh();
+            loadFleetData();
+        }
+    };
+};
+
+// Auto-start in standalone mode (no MyGeotab host)
+// When running inside MyGeotab, the host calls the factory function
+// geotab.addin.device_health_diagnostics() and then calls initialize(api, state, cb).
+// In standalone mode (opening the HTML directly), we invoke the factory ourselves
+// and use mock data for preview.
+(function () {
+    if (typeof document === "undefined") { return; }
+
+    // If we're running standalone (not inside MyGeotab), the factory won't be called
+    // by any host. Wait briefly, then self-initialize with mock data.
+    function tryStandaloneInit() {
+        // Check if the factory is still a function (MyGeotab hasn't called it yet)
+        if (typeof geotab.addin.device_health_diagnostics === "function") {
+            // Factory not yet invoked by MyGeotab — we're standalone.
+            // Invoke it ourselves and use mock data.
+            var addin = geotab.addin.device_health_diagnostics();
+            addin._initStandalone();
+        }
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () { setTimeout(tryStandaloneInit, 2000); });
+    } else {
+        setTimeout(tryStandaloneInit, 2000);
+    }
+})();
+
+</script>
 </body>
 </html>
