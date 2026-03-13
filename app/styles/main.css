@@ -1,0 +1,630 @@
+/* ===================================================================
+   Device Health Diagnostics — Styles
+   All rules scoped under #dhd-root to avoid MyGeotab conflicts.
+   =================================================================== */
+
+/* -- Root -- */
+#dhd-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #333;
+  background: #f5f6f8;
+  position: relative;
+}
+
+#dhd-root *, #dhd-root *::before, #dhd-root *::after {
+  box-sizing: border-box;
+}
+
+/* -- Views -- */
+#dhd-root .dhd-view {
+  display: none;
+}
+
+#dhd-root .dhd-view--active {
+  display: block;
+}
+
+/* -- Toolbar -- */
+#dhd-root .dhd-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 12px 16px;
+  background: #f5f6f8;
+  border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
+}
+
+/* -- Buttons -- */
+#dhd-root .dhd-btn {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  height: 34px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#dhd-root .dhd-btn-primary {
+  background: #4a90d9;
+  color: #fff;
+}
+
+#dhd-root .dhd-btn-primary:hover {
+  background: #3a7bc8;
+}
+
+#dhd-root .dhd-btn-secondary {
+  background: #fff;
+  color: #666;
+  border: 1px solid #ccc;
+}
+
+#dhd-root .dhd-btn-secondary:hover {
+  background: #f5f6f8;
+  border-color: #999;
+  color: #333;
+}
+
+#dhd-root .dhd-btn-back {
+  background: #fff;
+  color: #4a90d9;
+  border: 1px solid #4a90d9;
+}
+
+#dhd-root .dhd-btn-back:hover {
+  background: #f0f5ff;
+}
+
+/* -- Inputs -- */
+#dhd-root .dhd-input {
+  font-family: inherit;
+  font-size: 13px;
+  color: #333;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+}
+
+#dhd-root .dhd-input:focus {
+  outline: none;
+  border-color: #4a90d9;
+  box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.2);
+}
+
+/* -- Loading -- */
+#dhd-root .dhd-loading {
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+#dhd-root .dhd-loading[style*="display: flex"],
+#dhd-root .dhd-loading[style*="display:flex"] {
+  display: flex;
+}
+
+#dhd-root .dhd-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ddd;
+  border-top-color: #4a90d9;
+  border-radius: 50%;
+  animation: dhd-spin 0.7s linear infinite;
+}
+
+@keyframes dhd-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* -- Error -- */
+#dhd-root .dhd-error {
+  background: #fce4ec;
+  color: #c62828;
+  padding: 12px 16px;
+  border-radius: 4px;
+  border: 1px solid #c62828;
+  font-size: 13px;
+  margin: 8px 16px;
+}
+
+/* -- Content Area -- */
+#dhd-root .dhd-view--active {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px;
+}
+
+/* -- Section Titles -- */
+#dhd-root .dhd-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+/* -- KPI Cards -- */
+#dhd-root .dhd-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+#dhd-root .dhd-kpi-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px 12px;
+  text-align: center;
+  border-top: 4px solid #4a90d9;
+}
+
+#dhd-root .dhd-kpi-card--success { border-top-color: #2e7d32; }
+#dhd-root .dhd-kpi-card--warning { border-top-color: #e65100; }
+#dhd-root .dhd-kpi-card--error   { border-top-color: #c62828; }
+
+#dhd-root .dhd-kpi-value {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+#dhd-root .dhd-kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #666;
+}
+
+/* -- Insights Row -- */
+#dhd-root .dhd-insights-row {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1.5fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+#dhd-root .dhd-insight-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+/* -- Donut Chart -- */
+#dhd-root .dhd-donut-container {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 12px;
+}
+
+#dhd-root .dhd-donut-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#dhd-root .dhd-donut-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+#dhd-root .dhd-donut-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 12px;
+  text-align: center;
+}
+
+/* -- Table Header -- */
+#dhd-root .dhd-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#dhd-root .dhd-table-count {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+#dhd-root .dhd-table-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* -- Data Table -- */
+#dhd-root .dhd-table-wrap {
+  overflow-x: auto;
+}
+
+#dhd-root .dhd-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#dhd-root .dhd-table thead th,
+#dhd-root .dhd-sortable {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #666;
+  background: #f5f6f8;
+  border-bottom: 2px solid #ddd;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+#dhd-root .dhd-sortable:hover {
+  color: #333;
+  background: #ebedf0;
+}
+
+#dhd-root .dhd-sort-icon::after {
+  content: "\2195";
+  margin-left: 4px;
+  font-size: 10px;
+  opacity: 0.4;
+}
+
+#dhd-root .dhd-sort--asc .dhd-sort-icon::after {
+  content: "\2191";
+  opacity: 1;
+  color: #4a90d9;
+}
+
+#dhd-root .dhd-sort--desc .dhd-sort-icon::after {
+  content: "\2193";
+  opacity: 1;
+  color: #4a90d9;
+}
+
+#dhd-root .dhd-table tbody td {
+  padding: 8px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+}
+
+#dhd-root .dhd-table tbody tr {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+#dhd-root .dhd-table tbody tr:hover {
+  background: #f0f5ff;
+}
+
+#dhd-root .dhd-empty {
+  text-align: center;
+  padding: 24px;
+  color: #999;
+  font-style: italic;
+}
+
+/* -- Badges -- */
+#dhd-root .dhd-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+#dhd-root .dhd-badge-healthy  { background: #e8f5e9; color: #2e7d32; }
+#dhd-root .dhd-badge-info     { background: #e3f2fd; color: #1565c0; }
+#dhd-root .dhd-badge-warning  { background: #fff3e0; color: #e65100; }
+#dhd-root .dhd-badge-critical { background: #fce4ec; color: #c62828; }
+
+/* -- Score Bar -- */
+#dhd-root .dhd-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 100px;
+}
+
+#dhd-root .dhd-score-track {
+  flex: 1;
+  height: 8px;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 40px;
+}
+
+#dhd-root .dhd-score-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+#dhd-root .dhd-score-text {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #666;
+}
+
+/* -- Drill-Down Header -- */
+#dhd-root .dhd-drill-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+#dhd-root .dhd-drill-title h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+#dhd-root .dhd-drill-serial {
+  font-size: 13px;
+  color: #666;
+}
+
+/* -- Cards -- */
+#dhd-root .dhd-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+/* -- Drill-Down Grid -- */
+#dhd-root .dhd-drill-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* -- Health Score (drill-down) -- */
+#dhd-root .dhd-score-display {
+  text-align: center;
+  padding: 16px;
+}
+
+#dhd-root .dhd-score-value {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+#dhd-root .dhd-score-label {
+  font-size: 13px;
+  color: #666;
+  margin-top: 4px;
+}
+
+#dhd-root .dhd-score-healthy .dhd-score-value  { color: #2e7d32; }
+#dhd-root .dhd-score-warning .dhd-score-value  { color: #e65100; }
+#dhd-root .dhd-score-critical .dhd-score-value { color: #c62828; }
+
+/* -- Root Cause Cards -- */
+#dhd-root .dhd-root-cause {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 14px;
+  margin-bottom: 8px;
+  border-left: 4px solid #ddd;
+  background: #fff;
+}
+
+#dhd-root .dhd-root-cause--critical { border-left-color: #c62828; }
+#dhd-root .dhd-root-cause--warning  { border-left-color: #e65100; }
+#dhd-root .dhd-root-cause--info     { border-left-color: #1565c0; }
+
+#dhd-root .dhd-root-cause-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+#dhd-root .dhd-root-cause-rank {
+  font-weight: 700;
+  font-size: 14px;
+  color: #333;
+}
+
+#dhd-root .dhd-root-cause-category {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+#dhd-root .dhd-root-cause-confidence {
+  font-size: 12px;
+  color: #666;
+  margin-left: auto;
+}
+
+#dhd-root .dhd-root-cause-explanation {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+#dhd-root .dhd-root-cause-actions {
+  font-size: 13px;
+}
+
+#dhd-root .dhd-root-cause-actions strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+#dhd-root .dhd-root-cause-actions ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+#dhd-root .dhd-root-cause-actions li {
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+/* -- Charts Grid -- */
+#dhd-root .dhd-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+#dhd-root .dhd-chart-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  margin: 0 0 8px 0;
+}
+
+#dhd-root .dhd-charts-grid canvas {
+  width: 100%;
+  display: block;
+}
+
+/* -- Fault History Table -- */
+#dhd-root .dhd-table--faults {
+  font-size: 12px;
+}
+
+#dhd-root .dhd-table--faults th {
+  padding: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #666;
+  background: #f5f6f8;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+#dhd-root .dhd-table--faults td {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+/* -- Device Info Grid -- */
+#dhd-root .dhd-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 20px;
+}
+
+#dhd-root .dhd-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+#dhd-root .dhd-info-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #999;
+}
+
+#dhd-root .dhd-info-value {
+  font-size: 14px;
+  color: #333;
+}
+
+/* -- Empty State -- */
+#dhd-root .dhd-empty-state {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* -- Responsive -- */
+@media (max-width: 1100px) {
+  #dhd-root .dhd-insights-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  #dhd-root .dhd-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  #dhd-root .dhd-drill-grid {
+    grid-template-columns: 1fr;
+  }
+  #dhd-root .dhd-charts-grid {
+    grid-template-columns: 1fr;
+  }
+  #dhd-root .dhd-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  #dhd-root .dhd-view--active {
+    padding: 8px;
+  }
+  #dhd-root .dhd-kpi-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  #dhd-root .dhd-table-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  #dhd-root .dhd-input {
+    width: 100%;
+  }
+}
